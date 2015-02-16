@@ -7,6 +7,7 @@ import (
     "github.com/gin-gonic/gin"
     "strconv"
     "net/http"
+    //"fmt"
     //"time"
 )
 
@@ -18,7 +19,10 @@ type Socket struct {
     Transport int
     Router *gin.Engine
     Clients chan chan string
+    Connections map[string] interface{}
     Channels *list.List
+    Template string
+    Events *list.List
 }
 
 type Json map[string] interface{}
@@ -36,25 +40,51 @@ func (socket *Socket) Initialize() Socket {
     socket.Channels = list.New()
     socket.Clients  = make(chan chan string, 1)
 
+    // Socket template
+    socket.Router.LoadHTMLGlob(socket.Template)
+
+    // Events
+    socket.Connections = make(map[string] interface{})
+
     return *socket
 }
 
-func (s Socket) Emit(event string, data Json) {
-    fmt.Println("Send event : " + event)
+func (socket Socket) Debug(message string) {
+    fmt.Println(message)
+}
+
+func (socket Socket) Emit(event string, data Json) {
     buffer, err := json.Marshal(data)
 
     if err != nil {
         panic(err)
     }
-
     fmt.Println(string(buffer[:]))
+    //message <- string(buffer[:])
 }
 
 func (s Socket) Broadcast(event string, a interface {}) {
 }
 
-func (socket Socket) On(event string, callback func()) Socket {
-    return socket
+func (socket Socket) Wait(callback func()) {
+    go func() {
+        for {
+            callback()
+        }
+    }()
+}
+
+func (socket Socket) On(event string, callback func(socket Socket)) {
+    switch event {
+    case "connection":
+        socket.Wait(func() {
+            select {
+                case client := <- socket.Clients:
+                    socket.Connections[random()] = client
+                    callback(socket)
+            }
+        })
+    }
 }
 
 func (socket Socket) Static(route string, directory string) Socket {
@@ -62,20 +92,7 @@ func (socket Socket) Static(route string, directory string) Socket {
     return socket
 }
 
-func (socket Socket) ClientHandler() {
-    go func() {
-        for {
-            select {
-            case client := <- socket.Clients:
-                socket.Channels.PushBack(client)
-                fmt.Printf("New client: %d\n", socket.Channels.Len())
-            }
-        }
-    }()
-}
-
 func (socket Socket) Listen() Socket {
-    socket.ClientHandler()
     socket.Router.GET("/polling", func(context *gin.Context) {
         Polling {
             Clients: socket.Clients,

@@ -3,6 +3,7 @@ package main
 import	(
 	"testing"
 	"github.com/stretchr/testify/assert"
+	//"fmt"
 )
 
 func TestSocket(t *testing.T) {
@@ -14,17 +15,18 @@ func TestSocket(t *testing.T) {
 		Port: 3000,
 		Token: "acbz@3345123124567",
 		Transport: LongPolling,
+		Template: "asset/*",
 	}
 
 	socket.Initialize()
 	socket.Static("/static", "./asset")
 
-	socket.Emit("test", Json {
-		"data" : "abc",
-	})
-
-	socket.On("connection", func() {
-
+	socket.On("connection", func(socket Socket) {
+		socket.Debug("Client connected !")
+		socket.Emit("init", Json {
+			"user": "loint",
+			"token": "abcdd123sdc",
+		})
 	})
 
 	socket.Listen()
