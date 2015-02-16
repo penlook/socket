@@ -18,9 +18,15 @@ type Socket struct {
 
 type Json map[string] interface{}
 
-func (socket *Socket) Initialize() (Socket, error) {
+func (socket *Socket) Initialize() Socket {
+
+    // Route
+    gin.SetMode(gin.DebugMode)
     socket.Router = gin.Default()
-    return *socket, nil
+
+    // Anything else ?
+
+    return *socket
 }
 
 func (s Socket) Emit(event string, data Json) {
@@ -37,14 +43,16 @@ func (s Socket) Emit(event string, data Json) {
 func (s Socket) Broadcast(event string, a interface {}) {
 }
 
-func (s Socket) On(event string, callback func()) {
+func (socket Socket) On(event string, callback func()) Socket {
+    return socket
 }
 
-func (socket Socket) Static(route string, directory string) {
+func (socket Socket) Static(route string, directory string) Socket {
     socket.Router.Static(route, directory)
+    return socket
 }
 
-func (socket Socket) Handle() {
-    gin.SetMode(gin.DebugMode)
+func (socket Socket) Listen() Socket {
     socket.Router.Run(":" + strconv.Itoa(socket.Port))
+    return socket
 }

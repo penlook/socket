@@ -15,11 +15,18 @@ func TestSocket(t *testing.T) {
 		Transport: Polling,
 	}
 
-	socket.Emit("message", Json {
+	socket.Initialize()
+	socket.Static("/", "./assert")
+
+	socket.Emit("test", Json {
 		"data" : "abc",
-		"test" : "123",
 	})
 
+	socket.On("connection", func() {
+
+	})
+
+	socket.Listen()
 }
 
 
