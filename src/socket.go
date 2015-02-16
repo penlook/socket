@@ -2,18 +2,23 @@ package main
 
 import (
     "fmt"
+    "container/list"
     "encoding/json"
     "github.com/gin-gonic/gin"
     "strconv"
+    "net/http"
+    //"time"
 )
 
-const Polling int = 0
+const LongPolling int = 0
 
 type Socket struct {
     Port int
     Token string
     Transport int
     Router *gin.Engine
+    Clients chan chan string
+    Channels *list.List
 }
 
 type Json map[string] interface{}
@@ -24,7 +29,12 @@ func (socket *Socket) Initialize() Socket {
     gin.SetMode(gin.DebugMode)
     socket.Router = gin.Default()
 
-    // Anything else ?
+    // Client channel
+    socket.Clients = make(chan chan string, 1)
+
+    // Initialize empty linked list
+    socket.Channels = list.New()
+    socket.Clients  = make(chan chan string, 1)
 
     return *socket
 }
@@ -52,7 +62,26 @@ func (socket Socket) Static(route string, directory string) Socket {
     return socket
 }
 
+func (socket Socket) ClientHandler() {
+    go func() {
+        for {
+            select {
+            case client := <- socket.Clients:
+                socket.Channels.PushBack(client)
+                fmt.Printf("New client: %d\n", socket.Channels.Len())
+            }
+        }
+    }()
+}
+
 func (socket Socket) Listen() Socket {
-    socket.Router.Run(":" + strconv.Itoa(socket.Port))
+    socket.ClientHandler()
+    socket.Router.GET("/polling", func(context *gin.Context) {
+        Polling {
+            Clients: socket.Clients,
+            Context: context,
+        }.Handle()
+    })
+    http.ListenAndServe(":" + strconv.Itoa(socket.Port), socket.Router)
     return socket
 }
