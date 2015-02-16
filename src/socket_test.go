@@ -16,7 +16,7 @@ func TestSocket(t *testing.T) {
 	}
 
 	socket.Initialize()
-	socket.Static("/", "./assert")
+	socket.Static("/", "./asset")
 
 	socket.Emit("test", Json {
 		"data" : "abc",
