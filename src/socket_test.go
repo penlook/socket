@@ -1,4 +1,4 @@
-package socket
+package main
 
 import	(
 	"testing"
@@ -11,14 +11,15 @@ func TestSocket(t *testing.T) {
 
 	socket := Socket {
 		Port: 3000,
+		Token: "acbz@3345123124567",
 		Transport: Polling,
 	}
 
-	socket.Handle()
 	socket.Emit("message", Json {
 		"data" : "abc",
 		"test" : "123",
 	})
+
 }
 
 
