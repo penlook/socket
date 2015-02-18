@@ -2,21 +2,23 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"time"
+	//"github.com/astaxie/beego/session"
+	//"time"
+	//"fmt"
 )
 
 type Client struct {
-	Id string
 	Context *gin.Context
-	Time int32
+	Output chan Json
+	Handshake string
+	Timeout int32
 }
 
-func (client *Client) New(context *gin.Context) Client {
-	client.Id = random()
-	client.Context = context
-	client.Time = int32(time.Now().Unix())
-	return *Client
+func (client Client) Emit(event string, data Json) {
+    client.Output <- Json {
+    	"event": event,
+    	"data" : data,
+    }
 }
 
-func (client *Client) {
-}
+
