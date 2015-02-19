@@ -27,15 +27,24 @@ func TestSocket(t *testing.T) {
 	})
 
 	socket.On("connection", func(client Client) {
-		fmt.Println("Init")
 		client.Emit("init", Json {
 			"user": "loint",
 			"token": "abcdd123sdc",
 		})
-		fmt.Println("Init2")
 		client.Emit("init2", Json {
 			"user": "l234234",
 			"token": "abcd23432sdc",
+		})
+		client.Emit("abc", Json {
+			"test" : "12345",
+			"abc" : "test",
+		})
+		fmt.Println("authentication")
+		socket.On("auth", func(client Client) {
+			client.Emit("auth", Json {
+				"username" : "loint",
+				"password" : "12456",
+			})
 		})
 	})
 
