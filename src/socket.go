@@ -2,10 +2,7 @@ package main
 
 import (
     "fmt"
-    "container/list"
-    //"encoding/json"
     "github.com/gin-gonic/gin"
-    //"github.com/tommy351/gin-sessions"
     "strconv"
     "net/http"
     //"fmt"
@@ -14,26 +11,25 @@ import (
 
 const LongPolling int = 0
 
-type Json map[string] interface{}
+type Json map[string] interface {}
 
 type Context struct {
     Context *gin.Context
-    Channel chan Json
+    Channel chan *gin.Context
+    Output chan Json
+    Handshake string
+    Polling bool
 }
 
 type Socket struct {
     Port int
     Token string
     Transport int
-    Router *gin.Engine
-    Context chan Context
+ 	Event map[string] interface {}
     Clients map[string] Client
-    Client chan Client
-    Connections map[string] interface {}
-    Channels *list.List
-    Output chan Json
+    Context chan Context
+    Router *gin.Engine
     Template string
-    Events *list.List
 }
 
 func (socket *Socket) Initialize() Socket {
@@ -42,28 +38,16 @@ func (socket *Socket) Initialize() Socket {
     gin.SetMode(gin.DebugMode)
     socket.Router = gin.Default()
 
-    // Session
-    /*store := sessions.NewCookieStore([]byte("secret123"))
-    socket.Router.Use(sessions.Middleware("socket_session", store))*/
+    // Context
+    socket.Context = make(chan Context, 10)
 
-    // Request context
-    socket.Context = make(chan Context, 1000)
+    socket.Event = make(map[string] interface {})
 
     // Clients
-    socket.Clients = make(map[string] Client, 1000)
-    socket.Client = make(chan Client, 1000)
-
-    // Initialize empty linked list
-    socket.Channels = list.New()
+    socket.Clients = make(map[string] Client)
 
     // Socket template
     socket.Router.LoadHTMLGlob(socket.Template)
-
-    // Events
-    socket.Connections = make(map[string] interface{})
-
-    // Signal
-    socket.Output = make(chan Json, 1000)
 
     return *socket
 }
@@ -72,62 +56,35 @@ func (socket Socket) Debug(message string) {
     fmt.Println(message)
 }
 
-func (socket Socket) Wait(callback func()) {
-    go func() {
-        for {
-            callback()
-        }
-    }()
+func (socket Socket) ParseContext(context Context, callback func(client Client)) Client {
+
+	var client Client
+	if ! context.Polling {
+		fmt.Println("No Handshake")
+		client = socket.Clients[context.Handshake]
+	    client.Emit("connection", Json {
+	        "handshake" : context.Handshake,
+	    })
+	    fmt.Println("Callback")
+	    defer callback(client)
+	    return client
+	}
+
+	fmt.Println("Yes Handshake")
+
+	// Update new context for client indentified by handshake id
+	client = socket.Clients[context.Handshake]
+	client.Context = context.Context
+
+	if data := <- client.Output ; data != nil {
+        client.Output <- data
+    }
+
+    return client
 }
 
 func (socket Socket) On(event string, callback func(client Client)) {
-    switch event {
-    case "connection":
-        socket.Wait(func() {
-            select {
-                case context := <- socket.Context:
-                    fmt.Println("Process context")
-                    context.Context.Request.ParseForm()
-                    handshake := context.Context.Request.Form.Get("handshake")
-
-                    var client Client
-
-                    if handshake == "" {
-                        fmt.Println("No Handshake")
-                        handshake := random()
-                        fmt.Println("New Client " + handshake)
-
-                        client = Client {
-                            Context: context.Context,
-                            Channel: context.Channel,
-                            Handshake: handshake,
-                        }
-
-                        socket.Clients[handshake] = client
-                        client.Emit("connection", Json {
-                            "handshake" : handshake,
-                        })
-                        fmt.Println("Callback")
-                        callback(client)
-                        return
-                    }
-
-                    fmt.Println("YES Handshake")
-
-                    // Update new context
-                    client = socket.Clients[handshake]
-                    client.Context = context.Context
-
-                    fmt.Println(" --> TEST CHANNEL ")
-                    if data := <- client.Channel ; data != nil {
-                        socket.Output <- data
-                    }
-
-                    //client.Context.JSON(200, data)
-                    //break
-            }
-        })
-    }
+	socket.Event[event] = callback
 }
 
 func (socket Socket) Static(route string, directory string) Socket {
@@ -135,27 +92,74 @@ func (socket Socket) Static(route string, directory string) Socket {
     return socket
 }
 
+// Check polling request per connection
+func (socket Socket) LoopEvent(context Context) {
+	go func(callback) {
+		for {
+			select {
+				case context := <- context.Channel:
+					socket.ParseContext(context, callback)
+			}
+		}
+	}(socket.Event["connection"])
+}
+
+func (socket Socket) GetConnection(context *gin.Context) Context {
+
+	handshake := random()
+	output := make(chan Json, 10)
+
+	client := Client {
+       	Context: context,
+       	Output: output,
+    }
+
+    socket.Clients[handshake] = client
+
+	return Context {
+		Context   : context,
+		Output    : output,
+		Handshake : handshake,
+		Polling   : false,
+	}
+}
+
+func (socket Socket) GetPolling(context *gin.Context) Context {
+	fmt.Println("--> Get Polling")
+
+	handshake := context.Params.ByName("handshake")
+
+	client := socket.Clients[handshake]
+	client.Context = context
+
+	return Context {
+		Context : context,
+		Output : client.Output,
+		Handshake: handshake,
+		Polling: true,
+	}
+}
+
+func (socket Socket) Response(context Context) {
+	select {
+		case data := <- context.Output:
+			context.Context.JSON(200, data)
+			fmt.Println("--> End Response")
+	}
+}
+
 func (socket Socket) Listen() Socket {
 
     socket.Router.GET("/polling", func(_context *gin.Context) {
-        fmt.Println("----------- New Request ----------")
-        context := Context {
-            Context : _context,
-            Channel : make(chan Json, 100),
-        }
-        fmt.Println("----------- Assign context ----------")
-        socket.Context <- context
+    	context := socket.GetConnection(_context)
+    	socket.LoopEvent(context)
+    	socket.Response(context)
+    })
 
-        fmt.Println("----------- Select channel ----------")
-
-        select {
-        case data := <- context.Channel:
-            context.Context.JSON(200, data)
-            fmt.Println(" ---------- Request End -------- ")
-        case data := <- socket.Output:
-            context.Context.JSON(200, data)
-            fmt.Println(" ---------- Request End -------- ")
-        }
+    socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {
+    	context := socket.GetPolling(_context)
+    	context.Channel <- _context
+    	socket.Response(context)
     })
 
     http.ListenAndServe(":" + strconv.Itoa(socket.Port), socket.Router)

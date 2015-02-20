@@ -19,7 +19,6 @@ func TestSocket(t *testing.T) {
 		Template: "asset/*",
 	}
 
-	fmt.Println("Initialize")
 	socket.Initialize()
 
 	socket.Static("/static", "./asset")
@@ -28,23 +27,25 @@ func TestSocket(t *testing.T) {
 	})
 
 	socket.On("connection", func(client Client) {
-		client.Emit("abc", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
+		fmt.Println("On Connection")
+		client.Emit("init", Json {
+			"user": "loint",
+			"token": "abcdd123sdc",
+		})
+		client.Emit("init2", Json {
+			"user": "l234234",
+			"token": "abcd23432sdc",
 		})
 		client.Emit("abc", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
+			"test" : "12345",
+			"abc" : "test",
 		})
-		client.Emit("abc", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
-		})
-		client.On("test", func(client Client) {
-
+		fmt.Println("authentication")
+		socket.On("auth", func(client Client) {
+			client.Emit("auth", Json {
+				"username" : "loint",
+				"password" : "12456",
+			})
 		})
 	})
 

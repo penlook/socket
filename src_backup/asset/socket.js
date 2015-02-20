@@ -50,7 +50,7 @@ Socket.prototype  = {
         if (typeof this.handshake === 'string') {
             var option = {
                 method: "GET",
-                url: "/polling/" + this.handshake,
+                url: "/polling?handshake=" + this.handshake,
             };
 
             this.send(this, option, function(socket, data) {
