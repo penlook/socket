@@ -28,23 +28,30 @@ func TestSocket(t *testing.T) {
 	})
 
 	socket.On("connection", func(client Client) {
-		client.Emit("abc", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
-		})
-		client.Emit("abc", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
-		})
-		client.Emit("abc", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
-		})
-		client.On("test", func(client Client) {
 
+		client.Emit("abc", Json {
+			"key1" : "value1",
+			"key2" : "value2",
+			"key3" : "value3",
+		})
+
+		client.Emit("abc", Json {
+			"key1" : "value1",
+			"key2" : "value2",
+			"key3" : "value3",
+		})
+
+		client.Emit("abc", Json {
+			"key1" : "value1",
+			"key2" : "value2",
+			"key3" : "value3",
+		})
+
+		client.On("test", func(client Client) {
+			client.Emit("test", Json {
+				"abce" : "Hello",
+				"abcf" : "Yes",
+			})
 		})
 	})
 
