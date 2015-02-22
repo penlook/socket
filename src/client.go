@@ -1,15 +1,14 @@
 package main
 
 import (
+	"container/list"
 	"github.com/gin-gonic/gin"
-	"github.com/oleiade/lane"
-	"fmt"
-	//"container/list"
+	//"fmt"
 )
 
 type Event struct {
 	Name string
-	Callback func(client Client)
+	Callback func(data Json)
 }
 
 type Client struct {
@@ -17,26 +16,17 @@ type Client struct {
 	Channel chan Context
 	Output chan Json
 	Handshake string
-	Event *lane.Stack
+	Event *list.List
 	MaxNode int
 }
 
-func (client Client) On(event string, callback func(client Client)) {
-	fmt.Println("Client On " + event)
+func (client Client) On(event string, callback func(data Json)) {
 	client.MaxNode = client.MaxNode + 1
-
-	client.Event.Push( Node{
+	client.Event.PushBack(Node {
 		Id : client.MaxNode,
 		Event : event,
 		Callback : callback,
 	})
-
-	fmt.Println("Recursive")
-	callback(client)
-
-	fmt.Println("Back tracking")
-	/*node := client.Event.Pop()
-	fmt.Println(node)*/
 }
 
 func (client Client) Emit(event string, data Json) {

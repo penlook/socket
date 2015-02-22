@@ -49,19 +49,24 @@ func TestSocket(t *testing.T) {
 		})
 
 		fmt.Println("Client on")
-		client.On("test", func(client Client) {
+		client.On("abc", func(data Json) {
+			client.Emit("abc", Json {
+				"abced": "1234",
+			})
+		})
+		client.On("test", func(data Json) {
 			fmt.Println("Enter test event")
 			client.Emit("test", Json {
 				"abce" : "Hello",
 				"abcf" : "Yes",
 			})
 
-			client.On("test_2", func(client Client) {
+			client.On("test_2", func(data Json) {
 				client.Emit("abc", Json {
 					"test" : "1234",
 				})
-				client.On("test_3", func(client Client) {
-					client.On("test_4", func(client Client) {
+				client.On("test_3", func(data Json) {
+					client.On("test_4", func(data Json) {
 						client.Emit("abc", Json {
 							"test" : "1234",
 						})
@@ -70,12 +75,17 @@ func TestSocket(t *testing.T) {
 						"test" : "test",
 					})
 				})
-				client.On("test_5", func(client Client) {
+				client.On("test_5", func(data Json) {
 					client.Emit("abc", Json {
 						"abc3" : "234556",
 					})
-					client.On("test7", func(client Client) {
-						client.On("test8", func(client Client) {
+					client.On("test7", func(data Json) {
+						client.On("test8", func(data Json) {
+							client.Emit("abc", Json {
+								"abc" : "avc",
+							})
+						})
+						client.On("test9", func(data Json) {
 							client.Emit("abc", Json {
 								"abc" : "avc",
 							})
@@ -86,7 +96,7 @@ func TestSocket(t *testing.T) {
 					"abc" : "abc",
 				})
 			})
-			client.On("test6", func(client Client) {
+			client.On("test6", func(data Json) {
 				client.Emit("abcer", Json {
 					"abc" : "1245667",
 				})

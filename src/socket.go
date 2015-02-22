@@ -2,11 +2,11 @@ package main
 
 import (
     "fmt"
+    "container/list"
     "github.com/gin-gonic/gin"
     "strconv"
-    "github.com/oleiade/lane"
-    //"container/list"
     "net/http"
+    "encoding/json"
     //"fmt"
     //"time"
 )
@@ -121,15 +121,36 @@ func (socket Socket) RegisterClientEvent(event Event) {
 }
 
 func (socket Socket) LoopClientEvent(context Context) {
+    // Waiting for response
+}
 
-	client := socket.Clients[context.Handshake]
-    event  := client.Event
-    fmt.Println("Node List")
-    fmt.Println(event.Pop())
-    fmt.Println("Done")
+func (socket Socket) SubmitClientEvent(context Context) {
+    decoder := json.NewDecoder(context.Context.Request.Body)
+    var pkg Json
+    decoder.Decode(&pkg)
+    event_name := pkg["event"]
+    event_data  := pkg["data"]
 
-    // Scanning linked list
-    //events := client.Events
+    fmt.Println(event_name)
+    fmt.Println(event_data)
+
+    client := socket.Clients[context.Handshake]
+
+    var node Node
+    for cursor := client.Event.Front(); cursor != nil; cursor = cursor.Next() {
+        node = cursor.Value.(Node)
+        if node.Event == event_name {
+            node.Callback(pkg)
+        }
+    }
+
+    fmt.Println(" -------- TOTAL EVENT IS -------- ")
+    for cursor := client.Event.Front(); cursor != nil; cursor = cursor.Next() {
+        node = cursor.Value.(Node)
+        fmt.Println(node.Event)
+        fmt.Println("\n")
+    }
+    fmt.Println("---------------------------------")
 }
 
 func (socket Socket) GetConnection(context *gin.Context) Context {
@@ -137,7 +158,7 @@ func (socket Socket) GetConnection(context *gin.Context) Context {
 	handshake := random()
 	output    := make(chan Json, 10)
 	channel   := make(chan Context, 10)
-	event     := lane.NewStack()
+	event     := list.New()
 
 	client := Client {
        	Context: context,
@@ -179,10 +200,8 @@ func (socket Socket) GetPolling(context *gin.Context) Context {
 func (socket Socket) Response(context Context) {
 	select {
         case data := <- socket.Output:
-            fmt.Println("Response socket output")
             context.Context.JSON(200, data)
         case data := <- context.Output:
-            fmt.Println("Recieve output")
             context.Context.JSON(200, data)
 	}
 }
@@ -190,7 +209,6 @@ func (socket Socket) Response(context Context) {
 func (socket Socket) Listen() Socket {
 
     socket.Router.GET("/polling", func(_context *gin.Context) {
-        fmt.Println("Start connection")
     	context := socket.GetConnection(_context)
     	socket.LoopSocketEvent(context)
     	context.Channel <- context
@@ -199,13 +217,14 @@ func (socket Socket) Listen() Socket {
 
     socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {
     	context := socket.GetPolling(_context)
-        fmt.Println(context)
-        fmt.Println("Loop Client Event")
-    	socket.LoopClientEvent(context)
-        fmt.Println("Push to context channel")
     	context.Channel <- context
-        fmt.Println("Response")
     	socket.Response(context)
+    })
+
+    socket.Router.POST("/polling/:handshake", func(_context *gin.Context) {
+        context := socket.GetPolling(_context)
+        socket.SubmitClientEvent(context)
+        context.Channel <- context
     })
 
     http.ListenAndServe(":" + strconv.Itoa(socket.Port), socket.Router)
