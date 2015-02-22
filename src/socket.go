@@ -74,6 +74,14 @@ func (socket Socket) ParseContext(context Context, callback func(client Client))
 	        "handshake" : context.Handshake,
 	    })
         callback(client)
+
+        fmt.Println(" -------- TOTAL EVENT IS -------- ")
+        var node Node
+        for cursor := client.Event.Front(); cursor != nil; cursor = cursor.Next() {
+            node = cursor.Value.(Node)
+            fmt.Println(node.Event)
+            fmt.Println("\n")
+        }
 	    return client
 	}
 
@@ -125,15 +133,11 @@ func (socket Socket) LoopClientEvent(context Context) {
 }
 
 func (socket Socket) SubmitClientEvent(context Context) {
+
     decoder := json.NewDecoder(context.Context.Request.Body)
     var pkg Json
     decoder.Decode(&pkg)
     event_name := pkg["event"]
-    event_data  := pkg["data"]
-
-    fmt.Println(event_name)
-    fmt.Println(event_data)
-
     client := socket.Clients[context.Handshake]
 
     var node Node
@@ -150,7 +154,10 @@ func (socket Socket) SubmitClientEvent(context Context) {
         fmt.Println(node.Event)
         fmt.Println("\n")
     }
-    fmt.Println("---------------------------------")
+
+    context.Context.JSON(200, Json {
+         "status" : "OK",
+    })
 }
 
 func (socket Socket) GetConnection(context *gin.Context) Context {
@@ -224,7 +231,7 @@ func (socket Socket) Listen() Socket {
     socket.Router.POST("/polling/:handshake", func(_context *gin.Context) {
         context := socket.GetPolling(_context)
         socket.SubmitClientEvent(context)
-        context.Channel <- context
+        //context.Channel <- context
     })
 
     http.ListenAndServe(":" + strconv.Itoa(socket.Port), socket.Router)

@@ -30,9 +30,8 @@ func (client Client) On(event string, callback func(data Json)) {
 }
 
 func (client Client) Emit(event string, data Json) {
-	/*fmt.Println(client.Event)
 	client.Output <- Json {
     	"event": event,
     	"data" : data,
-    }*/
+    }
 }

@@ -1,12 +1,17 @@
 var Socket  = function() {
 
-    this.send = function(context, option, callback) {
-        console.log(option)
-        var data = option.data || {}
-        var async = option.async || true
+    this.sync = function(context, option, callback) {
+        var request = new XMLHttpRequest();
+        request.open(option.method, option.url, false);
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.send(option.data);
+        console.log(request.responseText);
+        callback(JSON.stringify(option.data));
+    },
+    this.async = function(context, option, callback) {
 
         var request = new XMLHttpRequest();
-            request.open(option.method, option.url, false);
+            request.open(option.method, option.url);
             request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             request.onreadystatechange = function () {
                 if (request.readyState != 4 || request.status != 200) return;
@@ -19,10 +24,12 @@ var Socket  = function() {
                     return false;
                 }
 
+                option.async = false;
                 callback(context, data);
             };
             console.log("Send " + JSON.stringify(option.data));
             request.send(JSON.stringify(option.data));
+            console.log("End request")
     };
 
     this.process = function(data) {
@@ -55,13 +62,14 @@ Socket.prototype  = {
         var option = {
             method: "GET",
             url: "/polling",
-            async: false
+            data: {},
         };
         console.log("send connection")
-        this.send(this, option, function(socket, data) {
+        this.sync(this, option, function(socket, data) {
+            console.log(data)
             if (data.event == "connection") {
                 socket.handshake = data.data.handshake;
-                //socket.pull();
+                socket.pull();
             }
         });
     },
@@ -70,10 +78,10 @@ Socket.prototype  = {
             var option = {
                 method: "GET",
                 url: "/polling/" + this.handshake,
-                async: true
+                data: {}
             };
 
-            this.send(this, option, function(socket, data) {
+            this.async(this, option, function(socket, data) {
                 socket.pull();
                 socket.process(data);
             });
@@ -91,7 +99,7 @@ Socket.prototype  = {
             };
 
             console.log("send connection")
-            this.send(this, option, function(socket, data) {
+            this.async(this, option, function(socket, data) {
                 console.log("Push done")
                 //callback(socket, data)
             });
@@ -100,12 +108,14 @@ Socket.prototype  = {
 };
 
 socket = new Socket();
-socket.connect();
-
+/*socket.connect();
+console.log('RUN')
 socket.on('test', function(data) {
     console.log(data);
 });
-
+console.log('RUN')
 socket.emit('test', {
     key: 'value'
-})
+})*/
+
+socket.sync()
