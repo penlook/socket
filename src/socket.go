@@ -8,7 +8,7 @@ import (
     "net/http"
     "encoding/json"
     //"fmt"
-    //"time"
+    "time"
 )
 
 const LongPolling int = 0
@@ -201,31 +201,35 @@ func (socket Socket) GetPolling(context *gin.Context) Context {
 }
 
 func (socket Socket) Response(context Context) {
-	select {
+    select {
         case data := <- socket.Output:
             context.Context.JSON(200, data)
         case data := <- context.Output:
             context.Context.JSON(200, data)
-	}
+    }
 }
 
 func (socket Socket) Listen() Socket {
 
     socket.Router.GET("/polling", func(_context *gin.Context) {
-    	context := socket.GetConnection(_context)
-    	socket.LoopSocketEvent(context)
-    	context.Channel <- context
-    	socket.Response(context)
+        fmt.Println("new request")
+        context := socket.GetConnection(_context)
+        socket.LoopSocketEvent(context)
+        context.Channel <- context
+        socket.Response(context)
     })
 
+
     socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {
-    	context := socket.GetPolling(_context)
+        fmt.Println("new request")
+        context := socket.GetPolling(_context)
         socket.InitClientEvent(context)
-    	context.Channel <- context
-    	socket.Response(context)
+	    context.Channel <- context
+	    socket.Response(context)
     })
 
     socket.Router.POST("/polling/:handshake", func(_context *gin.Context) {
+        fmt.Println("new request")
         context := socket.GetPolling(_context)
         socket.SubmitClientEvent(context)
         context.Channel <- context

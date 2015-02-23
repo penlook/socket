@@ -5,12 +5,20 @@ var Socket  = function() {
         request.open(option.method, option.url, false);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         request.send(option.data);
-        console.log(request.responseText);
-        callback(JSON.stringify(option.data));
+
+        try {
+            data = JSON.parse(request.responseText);
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+
+        console.log(data);
+
+        callback(context, data);
     },
 
     this.async = function(context, option, callback) {
-
         var request = new XMLHttpRequest();
         request.open(option.method, option.url);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -28,10 +36,7 @@ var Socket  = function() {
             option.async = false;
             callback(context, data);
         };
-        console.log("Send " + JSON.stringify(option.data));
         request.send(JSON.stringify(option.data));
-        console.log("End request");
-
     };
 
     this.process = function(data) {
@@ -68,7 +73,6 @@ Socket.prototype  = {
         };
         console.log("send connection")
         this.sync(this, option, function(socket, data) {
-            console.log(data)
             if (data.event == "connection") {
                 socket.handshake = data.data.handshake;
                 socket.pull();
@@ -96,8 +100,7 @@ Socket.prototype  = {
             var option = {
                 method: "POST",
                 url: "/polling/" + this.handshake,
-                data: data,
-                async: true
+                data: data
             };
 
             console.log("send connection")
@@ -110,7 +113,9 @@ Socket.prototype  = {
 };
 
 socket = new Socket();
-/*socket.connect();
+socket.connect();
+
+/*
 console.log('RUN')
 socket.on('test', function(data) {
     console.log(data);
@@ -119,5 +124,3 @@ console.log('RUN')
 socket.emit('test', {
     key: 'value'
 })*/
-
-socket.sync()
