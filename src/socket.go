@@ -63,31 +63,16 @@ func (socket Socket) Debug(message string) {
     fmt.Println(message)
 }
 
-func (socket Socket) ParseContext(context Context, callback func(client Client)) Client {
+func (socket Socket) UpdateContext(context Context) Client {
 
 	client := socket.Clients[context.Handshake]
     client.Context = context.Context
 
 	if ! context.Polling {
-        fmt.Println("Emit connection")
         socket.Emit("connection", Json {
 	        "handshake" : context.Handshake,
 	    })
-        callback(client)
-
-        fmt.Println(" -------- TOTAL EVENT IS -------- ")
-        var node Node
-        for cursor := client.Event.Front(); cursor != nil; cursor = cursor.Next() {
-            node = cursor.Value.(Node)
-            fmt.Println(node.Event)
-            fmt.Println("\n")
-        }
-	    return client
 	}
-
-	if data := <- client.Output ; data != nil {
-        client.Output <- data
-    }
 
     return client
 }
@@ -112,24 +97,34 @@ func (socket Socket) Static(route string, directory string) Socket {
 
 // Check polling request per connection
 func (socket Socket) LoopSocketEvent(context Context) {
-    fmt.Println("Loop Socket Event")
-	go func(callback func(client Client), context Context) {
+    go func(context Context) {
 		for {
 			select {
 				case context := <- context.Channel:
-                    fmt.Println("Parse Context")
-					socket.ParseContext(context, callback)
+					socket.UpdateContext(context)
 			}
 		}
-	} (socket.Event["connection"], context)
+	} (context)
 }
 
-func (socket Socket) RegisterClientEvent(event Event) {
+func (socket Socket) InitClientEvent(context Context) {
+    client := socket.Clients[context.Handshake]
 
-}
+    if ! client.HandshakeFlag {
+        fmt.Println("Event initialize")
+        client.HandshakeFlag = true
+        socket.Clients[context.Handshake] = client
+        callback := socket.Event["connection"]
+        callback(client)
+    }
 
-func (socket Socket) LoopClientEvent(context Context) {
-    // Waiting for response
+    fmt.Println(" -------- TOTAL EVENT IS -------- ")
+    var node Node
+    for cursor := client.Event.Front(); cursor != nil; cursor = cursor.Next() {
+        node = cursor.Value.(Node)
+        fmt.Println(node.Event)
+        fmt.Println("\n")
+    }
 }
 
 func (socket Socket) SubmitClientEvent(context Context) {
@@ -172,15 +167,16 @@ func (socket Socket) GetConnection(context *gin.Context) Context {
        	Output : output,
        	Channel: channel,
         Event: event,
+        HandshakeFlag: false,
         MaxNode: 0,
     }
 
     socket.Clients[handshake] = client
 
 	return Context {
-		Context   : context,
-		Output    : output,
-		Channel   : channel,
+		Context   : client.Context,
+		Output    : client.Output,
+		Channel   : client.Channel,
 		Handshake : handshake,
 		Polling   : false,
 	}
@@ -224,6 +220,7 @@ func (socket Socket) Listen() Socket {
 
     socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {
     	context := socket.GetPolling(_context)
+        socket.InitClientEvent(context)
     	context.Channel <- context
     	socket.Response(context)
     })
@@ -231,7 +228,7 @@ func (socket Socket) Listen() Socket {
     socket.Router.POST("/polling/:handshake", func(_context *gin.Context) {
         context := socket.GetPolling(_context)
         socket.SubmitClientEvent(context)
-        //context.Channel <- context
+        context.Channel <- context
     })
 
     http.ListenAndServe(":" + strconv.Itoa(socket.Port), socket.Router)

@@ -3,7 +3,7 @@ package main
 import (
 	"container/list"
 	"github.com/gin-gonic/gin"
-	//"fmt"
+	"fmt"
 )
 
 type Event struct {
@@ -16,11 +16,13 @@ type Client struct {
 	Channel chan Context
 	Output chan Json
 	Handshake string
+	HandshakeFlag bool
 	Event *list.List
 	MaxNode int
 }
 
 func (client Client) On(event string, callback func(data Json)) {
+	fmt.Println("Client on " +  event)
 	client.MaxNode = client.MaxNode + 1
 	client.Event.PushBack(Node {
 		Id : client.MaxNode,
@@ -30,8 +32,11 @@ func (client Client) On(event string, callback func(data Json)) {
 }
 
 func (client Client) Emit(event string, data Json) {
+	fmt.Println("Push event " + event)
 	client.Output <- Json {
     	"event": event,
     	"data" : data,
     }
+    fmt.Println("Client output len ")
+    fmt.Println(len(client.Output))
 }

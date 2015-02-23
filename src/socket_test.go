@@ -30,19 +30,19 @@ func TestSocket(t *testing.T) {
 	fmt.Println("On connection")
 	socket.On("connection", func(client Client) {
 		fmt.Println("Emit abc")
-		client.Emit("abc", Json {
+		client.Emit("abc1", Json {
 			"key1" : "value1",
 			"key2" : "value2",
 			"key3" : "value3",
 		})
 
-		client.Emit("abc", Json {
+		client.Emit("abc2", Json {
 			"key1" : "value1",
 			"key2" : "value2",
 			"key3" : "value3",
 		})
 
-		client.Emit("abc", Json {
+		client.Emit("abc3", Json {
 			"key1" : "value1",
 			"key2" : "value2",
 			"key3" : "value3",

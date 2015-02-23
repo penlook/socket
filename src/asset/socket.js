@@ -8,28 +8,30 @@ var Socket  = function() {
         console.log(request.responseText);
         callback(JSON.stringify(option.data));
     },
+
     this.async = function(context, option, callback) {
 
         var request = new XMLHttpRequest();
-            request.open(option.method, option.url);
-            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            request.onreadystatechange = function () {
-                if (request.readyState != 4 || request.status != 200) return;
+        request.open(option.method, option.url);
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        request.onreadystatechange = function () {
+            if (request.readyState != 4 || request.status != 200) return;
 
-                var data = {}
-                try {
-                    data = JSON.parse(request.responseText);
-                } catch (e) {
-                    console.log(e);
-                    return false;
-                }
+            var data = {}
+            try {
+                data = JSON.parse(request.responseText);
+            } catch (e) {
+                console.log(e);
+                return false;
+            }
 
-                option.async = false;
-                callback(context, data);
-            };
-            console.log("Send " + JSON.stringify(option.data));
-            request.send(JSON.stringify(option.data));
-            console.log("End request")
+            option.async = false;
+            callback(context, data);
+        };
+        console.log("Send " + JSON.stringify(option.data));
+        request.send(JSON.stringify(option.data));
+        console.log("End request");
+
     };
 
     this.process = function(data) {
