@@ -8,7 +8,7 @@ import (
     "net/http"
     "encoding/json"
     //"fmt"
-    "time"
+    //"time"
 )
 
 const LongPolling int = 0
@@ -30,7 +30,6 @@ type Socket struct {
  	Event map[string] func(client Client)
     Clients map[string] Client
     Context chan Context
-    Output chan Json
     Router *gin.Engine
     Template string
 }
@@ -50,9 +49,6 @@ func (socket *Socket) Initialize() Socket {
     // Clients
     socket.Clients = make(map[string] Client)
 
-    // Output
-    socket.Output = make(chan Json, 100)
-
     // Socket template
     socket.Router.LoadHTMLGlob(socket.Template)
 
@@ -69,9 +65,12 @@ func (socket Socket) UpdateContext(context Context) Client {
     client.Context = context.Context
 
 	if ! context.Polling {
-        socket.Emit("connection", Json {
-	        "handshake" : context.Handshake,
-	    })
+        context.Context.JSON(200, Json {
+            "event" : "connection",
+            "data"  : Json {
+                "handshake" : context.Handshake,
+            },
+        })
 	}
 
     return client
@@ -81,15 +80,6 @@ func (socket Socket) On(event string, callback func(client Client)) {
 	socket.Event[event] = callback
 }
 
-func (socket Socket) Emit(event string, data Json) {
-    fmt.Println("Socket emit handshake")
-	socket.Output <- Json {
-    	"event": event,
-    	"data" : data,
-    }
-    fmt.Println("Done emit")
-}
-
 func (socket Socket) Static(route string, directory string) Socket {
     socket.Router.Static(route, directory)
     return socket
@@ -97,14 +87,7 @@ func (socket Socket) Static(route string, directory string) Socket {
 
 // Check polling request per connection
 func (socket Socket) LoopSocketEvent(context Context) {
-    go func(context Context) {
-		for {
-			select {
-				case context := <- context.Channel:
-					socket.UpdateContext(context)
-			}
-		}
-	} (context)
+    socket.UpdateContext(context)
 }
 
 func (socket Socket) InitClientEvent(context Context) {
@@ -202,8 +185,6 @@ func (socket Socket) GetPolling(context *gin.Context) Context {
 
 func (socket Socket) Response(context Context) {
     select {
-        case data := <- socket.Output:
-            context.Context.JSON(200, data)
         case data := <- context.Output:
             context.Context.JSON(200, data)
     }
@@ -215,8 +196,6 @@ func (socket Socket) Listen() Socket {
         fmt.Println("new request")
         context := socket.GetConnection(_context)
         socket.LoopSocketEvent(context)
-        context.Channel <- context
-        socket.Response(context)
     })
 
 
