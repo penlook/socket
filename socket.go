@@ -12,6 +12,7 @@ const LongPolling int = 0
 
 type Json map[string] interface {}
 
+// Request context structure
 type Context struct {
     Context *gin.Context
     Channel chan Context
@@ -20,6 +21,7 @@ type Context struct {
     Polling bool
 }
 
+// Socket structure
 type Socket struct {
     Port int
     Token string
@@ -31,6 +33,7 @@ type Socket struct {
     Template string
 }
 
+// Initiazlie for socket
 func (socket *Socket) Initialize() Socket {
 
     // Route
@@ -52,6 +55,7 @@ func (socket *Socket) Initialize() Socket {
     return *socket
 }
 
+// Update new context for new or exist client per handshake
 func (socket Socket) UpdateContext(context Context) Client {
 
 	client := socket.Clients[context.Handshake]
@@ -69,10 +73,12 @@ func (socket Socket) UpdateContext(context Context) Client {
     return client
 }
 
+// Socket listen client event
 func (socket Socket) On(event string, callback func(client Client)) {
 	socket.Event[event] = callback
 }
 
+// Static resources
 func (socket Socket) Static(route string, directory string) Socket {
     socket.Router.Static(route, directory)
     return socket
@@ -83,6 +89,7 @@ func (socket Socket) LoopSocketEvent(context Context) {
     socket.UpdateContext(context)
 }
 
+// Scan client events in the first handshake
 func (socket Socket) InitClientEvent(context Context) {
     client := socket.Clients[context.Handshake]
 
@@ -94,6 +101,7 @@ func (socket Socket) InitClientEvent(context Context) {
     }
 }
 
+// Submit emit package from client
 func (socket Socket) SubmitClientEvent(context Context) {
 
     decoder := json.NewDecoder(context.Context.Request.Body)
@@ -115,6 +123,7 @@ func (socket Socket) SubmitClientEvent(context Context) {
     })
 }
 
+// Get fresh connection
 func (socket Socket) GetConnection(context *gin.Context) Context {
 
 	handshake := random()
@@ -144,6 +153,7 @@ func (socket Socket) GetConnection(context *gin.Context) Context {
 	}
 }
 
+// Get polling connection
 func (socket Socket) GetPolling(context *gin.Context) Context {
 	handshake := context.Params.ByName("handshake")
 	client := socket.Clients[handshake]
@@ -158,6 +168,7 @@ func (socket Socket) GetPolling(context *gin.Context) Context {
 	}
 }
 
+// Waiting for long-polling response
 func (socket Socket) Response(context Context) {
     select {
         case data := <- context.Output:
@@ -165,6 +176,7 @@ func (socket Socket) Response(context Context) {
     }
 }
 
+// Listen socket
 func (socket Socket) Listen() Socket {
 
     socket.Router.GET("/polling", func(_context *gin.Context) {
