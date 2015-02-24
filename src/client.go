@@ -3,7 +3,6 @@ package main
 import (
 	"container/list"
 	"github.com/gin-gonic/gin"
-	"fmt"
 )
 
 type Event struct {
@@ -40,11 +39,14 @@ func (client Client) Emit(event string, data Json) {
 
 func (client Client) Broadcast(event string, data Json) {
 	for handshake, _ := range client.Socket.Clients {
-		fmt.Println(handshake)
-		/*if handshake != client.Handshake {
-			go func() {
-				fmt.Println(handshake)
-			}()
-		}*/
+		go func(handshake string, event string, data Json) {
+			if handshake != client.Handshake {
+				client_ := client.Socket.Clients[handshake]
+				client_.Output <- Json {
+					"event": event,
+					"data" : data,
+				}
+			}
+		} (handshake, event, data)
 	}
 }

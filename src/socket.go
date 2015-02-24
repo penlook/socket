@@ -6,7 +6,6 @@ import (
     "strconv"
     "net/http"
     "encoding/json"
-    "fmt"
 )
 
 const LongPolling int = 0
@@ -147,7 +146,6 @@ func (socket Socket) GetConnection(context *gin.Context) Context {
 
 func (socket Socket) GetPolling(context *gin.Context) Context {
 	handshake := context.Params.ByName("handshake")
-    fmt.Println()
 	client := socket.Clients[handshake]
 	client.Context = context
 
@@ -175,6 +173,10 @@ func (socket Socket) Listen() Socket {
     })
 
     socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {
+        handshake := _context.Params.ByName("handshake")
+        if handshake == "" {
+            return
+        }
         context := socket.GetPolling(_context)
         socket.InitClientEvent(context)
 	    context.Channel <- context
@@ -182,6 +184,10 @@ func (socket Socket) Listen() Socket {
     })
 
     socket.Router.POST("/polling/:handshake", func(_context *gin.Context) {
+        handshake := _context.Params.ByName("handshake")
+        if handshake == "" {
+            return
+        }
         context := socket.GetPolling(_context)
         socket.SubmitClientEvent(context)
         context.Channel <- context
