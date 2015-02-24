@@ -54,7 +54,6 @@ type Socket struct {
     Clients map[string] Client
     Context chan Context
     Router *gin.Engine
-    Template string
 }
 
 // Initiazlie for socket
@@ -73,8 +72,7 @@ func (socket *Socket) Initialize() Socket {
     // Clients
     socket.Clients = make(map[string] Client)
 
-    // Socket template
-    socket.Router.LoadHTMLGlob(socket.Template)
+    socket.Router.Static("/client", "client/")
 
     return *socket
 }
@@ -100,6 +98,10 @@ func (socket Socket) UpdateContext(context Context) Client {
 // Socket listen client event
 func (socket Socket) On(event string, callback func(client Client)) {
 	socket.Event[event] = callback
+}
+
+func (socket Socket) Template(template_directory string) {
+    socket.Router.LoadHTMLGlob(template_directory + "/*")
 }
 
 // Static resources

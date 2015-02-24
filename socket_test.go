@@ -41,14 +41,12 @@ func TestSocket(t *testing.T) {
 		Port: 3000,
 		Token: "acbz@3345123124567",
 		Transport: LongPolling,
-		Template: "example/*",
 	}
 
 	socket.Initialize()
+	socket.Static("/static", "./example")
 
-	socket.Static("/static", "./client")
-	socket.Static("/resource", "./example")
-
+	socket.Template("example")
 	socket.Router.GET("/", func(context *gin.Context) {
 		context.HTML(200, "index.html", Json {})
 	})
@@ -65,6 +63,9 @@ func TestSocket(t *testing.T) {
 					"key" : "Package 2 from server",
 				})
 			})
+		})
+		client.Emit("test_on", Json {
+			"key" : "abcxyz",
 		})
 		client.On("test", func(data Json) {
 			client.Emit("test", Json {

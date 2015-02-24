@@ -25,11 +25,37 @@
  *     Loi Nguyen       <loint@penlook.com>
  */
 
-var Socket  = function() {
-    // Constructor
-    console.log('Constructor')
+/**
+ * Get params with default value
+ *
+ * @param  variable
+ * @param  default_value
+ * @return value of variable or default value
+ */
+var get = function(variable, default_value) {
+    if (typeof variable === 'undefined') {
+        variable = null;
+    }
+    variable = variable || default_value;
+    return variable;
+}
+
+/**
+ * Socket client
+ *
+ * @param port int default 80
+ */
+var Socket  = function(port) {
+    this.port = get(port, 80);
+    this.events = []
+    this.connect();
 };
 
+/**
+ * Socket prototype function
+ *
+ * @param port int default 80
+ */
 Socket.prototype  = {
 
     // Synchronous request
@@ -75,38 +101,48 @@ Socket.prototype  = {
 
     // Processor
     process : function(data) {
-        console.log(data)
+        var item, event;
+        for (item in this.events) {
+            event = this.events[item];
+            if (event.name == data.event) {
+                event.callback(data.data)
+            }
+        }
     },
 
     // Register event
     on : function(event, callback) {
-
+        this.events.push({
+            name : event,
+            callback : callback
+        });
     },
 
     // Remove event
     remove : function(event) {
-
+        // TODO
     },
 
     emit : function(event, data) {
-        console.log("Emit")
         this.push(this, {
             "event" : event,
             "data"  : data
         }, function(socket, data) {
-            console.log("Emitted !");
             console.log(data);
         });
     },
 
     // Establish new connection
     connect: function() {
+
+        // Establish configuration
         var option = {
             method: "GET",
             url: "/polling",
             data: {},
         };
-        console.log("send connection")
+
+        // Get initialize information
         this.sync(this, option, function(socket, data) {
             if (data.event == "connection") {
                 socket.handshake = data.data.handshake;
@@ -124,16 +160,16 @@ Socket.prototype  = {
                 data: {}
             };
 
+            // Synchronize data using request recursion
             this.async(this, option, function(socket, data) {
-                socket.pull();
                 socket.process(data);
+                socket.pull();
             });
         }
     },
 
     // Send data to server
     push: function(context, data, callback) {
-        console.log("Push to server")
         if (typeof this.handshake === 'string') {
 
             var option = {
@@ -142,11 +178,7 @@ Socket.prototype  = {
                 data: data
             };
 
-            console.log("send connection")
-            this.async(this, option, function(socket, data) {
-                console.log("Push done")
-                //callback(socket, data)
-            });
+            this.async(this, option, function(socket, data) {});
         }
     }
 };
