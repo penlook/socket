@@ -5,13 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Event structure
-type Event struct {
-	Id int
-	Name string
-	Callback func(data Json)
-}
-
 // Client structure
 type Client struct {
 	Socket Socket

@@ -10,8 +10,6 @@ import (
 
 const LongPolling int = 0
 
-type Json map[string] interface {}
-
 // Request context structure
 type Context struct {
     Context *gin.Context

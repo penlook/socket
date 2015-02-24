@@ -4,6 +4,10 @@ Real-time library for Go based on Long-Polling
 # Documentation
 Server
 ```go
+import (
+	. "github.com/penlook/socket"
+)
+
 socket := Socket {
 	Port: 3000,
 	Token: "acbz@3345123124567",
@@ -16,8 +20,11 @@ socket.Static("/static", "./asset")
 
 socket.On("connection", func(client Client) {
 	client.On("init", func(data Json) {
+		// TODO
 	})
 })
+
+socket.Listen()
 ```
 
 Client
