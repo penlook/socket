@@ -72,8 +72,6 @@ Socket.prototype  = {
             return false;
         }
 
-        console.log(data);
-
         callback(context, data);
     },
 

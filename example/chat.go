@@ -28,22 +28,46 @@ package main
 
 import (
 	. "github.com/penlook/socket"
+	"github.com/gin-gonic/gin"
+	"fmt"
 )
 
 func main() {
+
 	socket := Socket {
-	    Port: 3000,
-	    Token: "acbz@3345123124567",
-	    Transport: LongPolling,
-	    Template: "asset/*",
+		Port: 3000,
+		Token: "acbz@3345123124567",
+		Interval: 60,
 	}
 
 	socket.Initialize()
-	socket.Static("/static", "./asset")
+
+	// Mapping resources
+	socket.Static("/static", "./")
+	socket.Static("/client", "./../client")
+	socket.Template("./")
+
+	socket.Router.GET("/", func(context *gin.Context) {
+		context.HTML(200, "login.html", Json {})
+	})
+
+	socket.Router.GET("/chat/", func(context *gin.Context) {
+		context.Request.ParseForm()
+		context.HTML(200, "chat.html", Json {
+			"username" : context.Request.Form.Get("username"),
+		})
+	})
 
 	socket.On("connection", func(client Client) {
-	    client.On("init", func(data Json) {
-	    })
+		client.On("init", func(data Json) {
+			client.Broadcast("listchat", Json {
+
+			})
+		})
+	})
+
+	socket.On("disconnect", func(client Client) {
+		fmt.Println("Connection is corrupt !")
 	})
 
 	socket.Listen()

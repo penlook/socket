@@ -74,8 +74,6 @@ func (socket *Socket) Initialize() Socket {
     // Clients
     socket.Clients = make(map[string] Client)
 
-    socket.Router.Static("/client", "client/")
-
     return *socket
 }
 
