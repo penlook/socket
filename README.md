@@ -1,6 +1,8 @@
 # Penlook Socket
 Real-time library for Go based on Long-Polling
 
+[![Build Status](https://travis-ci.org/penlook/socket.svg?branch=master)](https://travis-ci.org/penlook/socket) [![GoDoc](https://godoc.org/github.com/penlook/socket?status.png)](https://godoc.org/github.com/penlook/socket)
+
 # Documentation
 Server
 ```go
