@@ -12,6 +12,7 @@ type Event struct {
 }
 
 type Client struct {
+	Socket Socket
 	Context *gin.Context
 	Channel chan Context
 	Output chan Json
@@ -22,7 +23,6 @@ type Client struct {
 }
 
 func (client Client) On(event string, callback func(data Json)) {
-	fmt.Println("Client on " +  event)
 	client.MaxNode = client.MaxNode + 1
 	client.Event.PushBack(Node {
 		Id : client.MaxNode,
@@ -32,11 +32,19 @@ func (client Client) On(event string, callback func(data Json)) {
 }
 
 func (client Client) Emit(event string, data Json) {
-	fmt.Println("Push event " + event)
 	client.Output <- Json {
     	"event": event,
     	"data" : data,
     }
-    fmt.Println("Client output len ")
-    fmt.Println(len(client.Output))
+}
+
+func (client Client) Broadcast(event string, data Json) {
+	for handshake, _ := range client.Socket.Clients {
+		fmt.Println(handshake)
+		/*if handshake != client.Handshake {
+			go func() {
+				fmt.Println(handshake)
+			}()
+		}*/
+	}
 }

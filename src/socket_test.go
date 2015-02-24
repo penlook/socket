@@ -4,7 +4,6 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/gin-gonic/gin"
-	"fmt"
 )
 
 func TestSocket(t *testing.T) {
@@ -19,7 +18,6 @@ func TestSocket(t *testing.T) {
 		Template: "asset/*",
 	}
 
-	fmt.Println("Initialize")
 	socket.Initialize()
 
 	socket.Static("/static", "./asset")
@@ -27,22 +25,22 @@ func TestSocket(t *testing.T) {
 		context.HTML(200, "index.html", Json {})
 	})
 
-	fmt.Println("On connection")
 	socket.On("connection", func(client Client) {
 		client.On("init", func(data Json) {
-			fmt.Println(data)
-			client.Emit("test", Json {
+			/*client.Emit("test", Json {
 				"key": "Package from server",
+			})*/
+			client.Broadcast("test", Json {
+				"eventdata" : "Broadcast",
 			})
+
 			client.On("test2", func(data Json) {
-				fmt.Println(data)
 				client.Emit("test2", Json {
 					"key" : "Package 2 from server",
 				})
 			})
 		})
 		client.On("test", func(data Json) {
-			fmt.Println("Enter test event")
 			client.Emit("test", Json {
 				"abce" : "Hello",
 				"abcf" : "Yes",
