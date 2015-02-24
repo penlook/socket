@@ -15,21 +15,21 @@ func TestSocket(t *testing.T) {
 		Port: 3000,
 		Token: "acbz@3345123124567",
 		Transport: LongPolling,
-		Template: "asset/*",
+		Template: "example/*",
 	}
 
 	socket.Initialize()
 
-	socket.Static("/static", "./asset")
+	socket.Static("/static", "./client")
+	socket.Static("/resource", "./example")
+
 	socket.Router.GET("/", func(context *gin.Context) {
 		context.HTML(200, "index.html", Json {})
 	})
 
 	socket.On("connection", func(client Client) {
 		client.On("init", func(data Json) {
-			/*client.Emit("test", Json {
-				"key": "Package from server",
-			})*/
+
 			client.Broadcast("test", Json {
 				"eventdata" : "Broadcast",
 			})

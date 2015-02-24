@@ -1,8 +1,6 @@
 var Socket  = function() {
     // Constructor
-    function() {
-        console.log('Constructor')
-    }()
+    console.log('Constructor')
 };
 
 Socket.prototype  = {
