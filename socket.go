@@ -102,11 +102,11 @@ func (socket Socket) SubmitClientEvent(context Context) {
     event_name := pkg["event"]
     client := socket.Clients[context.Handshake]
 
-    var node Node
+    var event Event
     for cursor := client.Event.Front(); cursor != nil; cursor = cursor.Next() {
-        node = cursor.Value.(Node)
-        if node.Event == event_name {
-            node.Callback(pkg)
+        event = cursor.Value.(Event)
+        if event.Name == event_name {
+            event.Callback(pkg)
         }
     }
 
@@ -130,7 +130,7 @@ func (socket Socket) GetConnection(context *gin.Context) Context {
         Event: event,
         Handshake: handshake,
         HandshakeFlag: false,
-        MaxNode: 0,
+        MaxEvent: 0,
     }
 
     socket.Clients[handshake] = client
