@@ -1,0 +1,12 @@
+#chatarea {
+	width: 950px;
+	margin: 20px auto;
+}
+
+#chatarea table td {
+	vertical-align: top;
+}
+
+.panel-body {
+	height: 400px;
+}
