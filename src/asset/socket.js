@@ -115,12 +115,16 @@ Socket.prototype  = {
 socket = new Socket();
 socket.connect();
 
-/*
-console.log('RUN')
+socket.on('test2', function(data) {
+    console.log(data)
+})
+
 socket.on('test', function(data) {
-    console.log(data);
+    socket.emit('test2', {
+        data : 'Package 2 from client'
+    })
 });
-console.log('RUN')
-socket.emit('test', {
-    key: 'value'
-})*/
+
+socket.emit('init', {
+    data: 'Package from client'
+})

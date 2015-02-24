@@ -29,29 +29,16 @@ func TestSocket(t *testing.T) {
 
 	fmt.Println("On connection")
 	socket.On("connection", func(client Client) {
-		fmt.Println("Emit abc")
-		client.Emit("abc1", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
-		})
-
-		client.Emit("abc2", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
-		})
-
-		client.Emit("abc3", Json {
-			"key1" : "value1",
-			"key2" : "value2",
-			"key3" : "value3",
-		})
-
-		fmt.Println("Client on")
-		client.On("abc", func(data Json) {
-			client.Emit("abc", Json {
-				"abced": "1234",
+		client.On("init", func(data Json) {
+			fmt.Println(data)
+			client.Emit("test", Json {
+				"key": "Package from server",
+			})
+			client.On("test2", func(data Json) {
+				fmt.Println(data)
+				client.Emit("test2", Json {
+					"key" : "Package 2 from server",
+				})
 			})
 		})
 		client.On("test", func(data Json) {

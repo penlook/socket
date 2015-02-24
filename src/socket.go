@@ -198,7 +198,6 @@ func (socket Socket) Listen() Socket {
         socket.LoopSocketEvent(context)
     })
 
-
     socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {
         fmt.Println("new request")
         context := socket.GetPolling(_context)
