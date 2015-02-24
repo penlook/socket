@@ -32,6 +32,7 @@ import (
     "strconv"
     "net/http"
     "encoding/json"
+    "time"
 )
 
 const LongPolling int = 0
@@ -50,6 +51,7 @@ type Socket struct {
     Port int
     Token string
     Transport int
+    Interval time.Duration
  	Event map[string] func(client Client)
     Clients map[string] Client
     Context chan Context
@@ -196,9 +198,22 @@ func (socket Socket) GetPolling(context *gin.Context) Context {
 
 // Waiting for long-polling response
 func (socket Socket) Response(context Context) {
+    timeout := make(chan bool, 1)
+
+    // Timeout monitoring
+    go func() {
+        time.Sleep(socket.Interval * time.Second)
+        timeout <- true
+    }()
+
     select {
         case data := <- context.Output:
             context.Context.JSON(200, data)
+        case <- timeout:
+            context.Context.JSON(200, Json {
+                "event" : "heartbeat",
+                "status" : "good",
+            })
     }
 }
 

@@ -13,12 +13,10 @@ import (
 socket := Socket {
 	Port: 3000,
 	Token: "acbz@3345123124567",
-	Transport: LongPolling,
-	Template: "asset/*",
+	Interval: 60,
 }
 
 socket.Initialize()
-socket.Static("/static", "./asset")
 
 socket.On("connection", func(client Client) {
 	client.On("init", func(data Json) {
@@ -31,7 +29,7 @@ socket.Listen()
 
 Client
 ```javascript
-var socket = new Socket();
+var socket = new Socket(3000);
 
 socket.on('test2', function(data) {
     console.log(data)

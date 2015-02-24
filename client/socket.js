@@ -78,7 +78,9 @@ Socket.prototype  = {
     },
 
     // Asynchronous request
-    async : function(context, option, callback) {
+    async : function(context, option, callback, call_timeout) {
+        option.timeout = get(option.timeout, 1000*600);
+
         var request = new XMLHttpRequest();
         request.open(option.method, option.url);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -96,6 +98,12 @@ Socket.prototype  = {
             option.async = false;
             callback(context, data);
         };
+
+        request.timeout = option.timeout
+        request.ontimeout = function() {
+            call_timeout(context);
+        };
+
         request.send(JSON.stringify(option.data));
     },
 
@@ -163,6 +171,8 @@ Socket.prototype  = {
             // Synchronize data using request recursion
             this.async(this, option, function(socket, data) {
                 socket.process(data);
+                socket.pull();
+            }, function(socket) {
                 socket.pull();
             });
         }

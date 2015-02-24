@@ -40,7 +40,7 @@ func TestSocket(t *testing.T) {
 	socket := Socket {
 		Port: 3000,
 		Token: "acbz@3345123124567",
-		Transport: LongPolling,
+		Interval: 60,
 	}
 
 	socket.Initialize()
