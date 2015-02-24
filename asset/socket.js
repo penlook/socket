@@ -1,6 +1,14 @@
 var Socket  = function() {
+    // Constructor
+    function() {
+        console.log('Constructor')
+    }()
+};
 
-    this.sync = function(context, option, callback) {
+Socket.prototype  = {
+
+    // Synchronous request
+    sync : function(context, option, callback) {
         var request = new XMLHttpRequest();
         request.open(option.method, option.url, false);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -18,7 +26,8 @@ var Socket  = function() {
         callback(context, data);
     },
 
-    this.async = function(context, option, callback) {
+    // Asynchronous request
+    async : function(context, option, callback) {
         var request = new XMLHttpRequest();
         request.open(option.method, option.url);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -37,24 +46,23 @@ var Socket  = function() {
             callback(context, data);
         };
         request.send(JSON.stringify(option.data));
-    };
+    },
 
-    this.process = function(data) {
+    // Processor
+    process : function(data) {
         console.log(data)
-    };
-};
+    },
 
-Socket.prototype  = {
-    on  : function(event, fct) {
-        this._events = this._events || {};
-        this._events[event] = this._events[event] || [];
-        this._events[event].push(fct);
+    // Register event
+    on : function(event, callback) {
+
     },
-    remove  : function(event, fct) {
-        this._events = this._events || {};
-        if( event in this._events === false)  return;
-        this._events[event].splice(this._events[event].indexOf(fct), 1);
+
+    // Remove event
+    remove : function(event) {
+
     },
+
     emit : function(event, data) {
         console.log("Emit")
         this.push(this, {
@@ -65,6 +73,8 @@ Socket.prototype  = {
             console.log(data);
         });
     },
+
+    // Establish new connection
     connect: function() {
         var option = {
             method: "GET",
@@ -79,6 +89,8 @@ Socket.prototype  = {
             }
         });
     },
+
+    // Pull data by using polling request
     pull: function() {
         if (typeof this.handshake === 'string') {
             var option = {
@@ -93,6 +105,8 @@ Socket.prototype  = {
             });
         }
     },
+
+    // Send data to server
     push: function(context, data, callback) {
         console.log("Push to server")
         if (typeof this.handshake === 'string') {
@@ -111,20 +125,3 @@ Socket.prototype  = {
         }
     }
 };
-
-socket = new Socket();
-socket.connect();
-
-socket.on('test2', function(data) {
-    console.log(data)
-})
-
-socket.on('test', function(data) {
-    socket.emit('test2', {
-        data : 'Package 2 from client'
-    })
-});
-
-socket.emit('init', {
-    data: 'Package from client'
-})

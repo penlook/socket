@@ -1,4 +1,4 @@
-# socket
+# Penlook Socket
 Real-time library for Go based on Long-Polling
 
 # Documentation
