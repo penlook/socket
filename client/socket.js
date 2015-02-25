@@ -160,15 +160,10 @@ Socket.prototype  = {
 
     // Remove event
     removeEvent : function(event) {
-
+        // TODO
     },
 
     removeAllEvent : function() {
-
-    },
-
-    // Remove event
-    remove : function(event) {
         // TODO
     },
 
@@ -230,7 +225,7 @@ Socket.prototype  = {
                 data: data
             };
 
-            this.async(this, option, function(socket, data) {});
+            this.async(this, option, callback);
         }
     }
 };

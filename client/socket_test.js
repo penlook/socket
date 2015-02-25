@@ -1,20 +1,8 @@
 var $ = QUnit;
 
-$.module("test socket", {
+$.test("get option", function(assert) {
 
-	// Setup
-	beforeEach: function() {
-    	this.socket = new Socket(3000);
-  	},
-
-  	// Teardown
-  	afterEach: function() {
-  		this.socket.removeAllEvent();
-  	}
-});
-
-$.test("get options", function(assert) {
-
+	// Test 1
 	custom_option = {
 		key2 : "value3",
 		key3 : "value1",
@@ -36,9 +24,50 @@ $.test("get options", function(assert) {
 		key4 : "value4",
 	});
 
+	// Test 2
+	custom_option = {
+	};
+
+	default_option = {
+		key1 : "value1",
+		key2 : "value2",
+		key3 : "value3",
+		key4 : "value4",
+	};
+
+	output = getOption(custom_option, default_option);
+
+	assert.deepEqual(output, {
+		key1 : "value1",
+		key2 : "value2",
+		key3 : "value3",
+		key4 : "value4",
+	});
+
+	// Test 3
+	custom_option = {
+		key1 : "value1",
+		key2 : "value2",
+		key3 : "value3",
+		key4 : "value4",
+	};
+
+	default_option = {
+	};
+
+	output = getOption(custom_option, default_option);
+
+	assert.deepEqual(output, {
+		key1 : "value1",
+		key2 : "value2",
+		key3 : "value3",
+		key4 : "value4",
+	});
 });
 
 $.test("synchronous request", function(assert) {
+	this.socket = new Socket(3000);
+
 	var option = {
 		url : "/polling",
 	};
@@ -49,6 +78,7 @@ $.test("synchronous request", function(assert) {
 });
 
 $.test("asynchronous request", function(assert) {
+	this.socket = new Socket(3000);
 
 	// Asynchronous wating ...
 	var done = assert.async();
@@ -64,6 +94,7 @@ $.test("asynchronous request", function(assert) {
 });
 
 $.test("create handshake", function(assert) {
+	this.socket = new Socket(3000);
 
 	// Handshake was created
 	assert.ok(true, typeof this.socket.handshake !== 'undefined');
@@ -76,6 +107,7 @@ $.test("create handshake", function(assert) {
 });
 
 $.test("process response data", function(assert) {
+	this.socket = new Socket(3000);
 
 	data = {
 		key1: "value1",
@@ -98,13 +130,14 @@ $.test("process response data", function(assert) {
 });
 
 $.test("push data to server", function(assert) {
+	this.socket = new Socket(3000);
+	var done = assert.async();
 
 	this.socket.push(this, {
         "event" : event,
         "data"  : data
     }, function(socket, data) {
-        console.log(data);
+    	assert.equal(data.status, "OK");
+        done();
     });
-
-    assert.equal("OK", "OK");
 });
