@@ -42,6 +42,7 @@ var socket_socket = Socket {
 }
 
 func TestSocketInitialize(t *testing.T) {
+
 	assert := assert.New(t)
 	socket_socket.Initialize()
 	assert.NotNil(socket_socket.Router)
@@ -54,22 +55,69 @@ func TestSocketInitialize(t *testing.T) {
 
 	assert.NotNil(socket_socket.Clients)
 	assert.Equal(0, len(socket_socket.Clients))
+
 }
 
 func TestSocketGetConnection(t *testing.T) {
+
 	assert := assert.New(t)
 
+	// Mockup HTTP Request
 	request, _ := http.NewRequest("GET", "/polling", nil)
+
+	// Create request recorder
 	writer := httptest.NewRecorder()
 
 	var context Context
 
+	// Register handler for mock request
 	socket_socket.Router.GET("/polling", func(context_ *gin.Context) {
 		context = socket_socket.GetConnection(context_)
 	})
 
+	// Start request
 	socket_socket.Router.ServeHTTP(writer, request)
+
+	// Assert result
 	assert.Equal(true, (len(context.Handshake) == 20))
+	assert.Equal(false, context.Polling)
+	assert.NotNil(socket_socket.Clients[context.Handshake])
+}
+
+func TestSocketGetPolling(t *testing.T) {
+
+	assert := assert.New(t)
+	assert.Equal("test", "test")
+
+ 	var handshake string
+
+	for handshake_, _ := range socket_socket.Clients {
+		handshake = handshake_
+	}
+
+	// Mockup HTTP Request
+
+	request, _ := http.NewRequest("GET", "/polling/" + handshake, nil)
+	writer := httptest.NewRecorder()
+
+	var context Context
+
+	// Register handler for mock request
+	socket_socket.Router.GET("/polling/:handshake", func(context_ *gin.Context) {
+		context = socket_socket.GetPolling(context_)
+	})
+
+	// Start request
+	socket_socket.Router.ServeHTTP(writer, request)
+
+	assert.Equal(true, (len(context.Handshake) == 20))
+	assert.Equal(true, context.Polling)
+	assert.Equal(socket_socket.Clients[handshake].Context, context.Context)
+}
+
+func TestSocketOn(t *testing.T) {
+	assert := assert.New(t)
+	assert.Equal("test", "test")
 }
 
 func TestSocketUpdateContext(t *testing.T) {
