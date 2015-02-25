@@ -120,13 +120,13 @@ func TestClientBroadcast(t *testing.T) {
 	socket_client.Initialize()
 	assert.NotNil(socket_client.Clients)
 	assert.Equal(0, len(socket_client.Clients))
-	socket_client.Clients[client.Handshake] = client
+	socket_client.Clients[client.Handshake] = &client
 
 	num := 10000
 
 	for i := 0; i < num; i++ {
 		client_ := createClient()
-		socket_client.Clients[client_.Handshake] = client_
+		socket_client.Clients[client_.Handshake] = &client_
 	}
 
 	client.Socket = socket_client
@@ -142,7 +142,7 @@ func TestClientBroadcast(t *testing.T) {
 
 	for handshake, client_ := range socket_client.Clients {
 		if client.Handshake != handshake {
-			go func(client_ Client) {
+			go func(client_ *Client) {
 				times ++
 				assert.Equal(Json {
 					"event" : "test",
@@ -169,13 +169,13 @@ func TestClientBroadcastAll(t *testing.T) {
 	socket_client.Initialize()
 	assert.NotNil(socket_client.Clients)
 	assert.Equal(0, len(socket_client.Clients))
-	socket_client.Clients[client.Handshake] = client
+	socket_client.Clients[client.Handshake] = &client
 
 	num := 10000
 
 	for i := 0; i < num; i++ {
 		client_ := createClient()
-		socket_client.Clients[client_.Handshake] = client_
+		socket_client.Clients[client_.Handshake] = &client_
 	}
 
 	client.Socket = socket_client
@@ -199,7 +199,7 @@ func TestClientBroadcastAll(t *testing.T) {
 					"key2" : "value2",
 				},
 			}, <- client_.Output)
-		} (client_)
+		} (*client_)
 	}
 
 	// Waiting for all channel

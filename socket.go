@@ -34,6 +34,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"time"
+	//"fmt"
 )
 
 // Long polling - Implemented
@@ -61,7 +62,7 @@ type Socket struct {
 	Transport int
 	Interval time.Duration
 	Event map[string] func(client Client)
-	Clients map[string] Client
+	Clients map[string] *Client
 	Context chan Context
 	Router *gin.Engine
 }
@@ -81,7 +82,7 @@ func (socket *Socket) Initialize() Socket {
 	socket.Event = make(map[string] func(client Client))
 
 	// Clients
-	socket.Clients = make(map[string] Client)
+	socket.Clients = make(map[string] *Client)
 
 	return *socket
 }
@@ -101,7 +102,7 @@ func (socket Socket) UpdateContext(context Context) Client {
 		})
 	}
 
-	return client
+	return *client
 }
 
 // Socket listen client event
@@ -122,13 +123,14 @@ func (socket Socket) Static(route string, directory string) Socket {
 
 // Scan client events in the first handshake
 func (socket Socket) InitClientEvent(context Context) {
-	client := socket.Clients[context.Handshake]
+
+	client  := socket.Clients[context.Handshake]
 
 	if ! client.HandshakeFlag {
 		client.HandshakeFlag = true
 		socket.Clients[context.Handshake] = client
 		callback := socket.Event["connection"]
-		callback(client)
+		callback(*client)
 	}
 }
 
@@ -187,7 +189,7 @@ func (socket Socket) GetConnection(context *gin.Context) Context {
 		MaxEvent: 0,
 	}
 
-	socket.Clients[handshake] = client
+	socket.Clients[handshake] = &client
 
 	return Context {
 		Context   : client.Context,

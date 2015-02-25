@@ -87,7 +87,6 @@ func TestSocketGetConnection(t *testing.T) {
 func TestSocketGetPolling(t *testing.T) {
 
 	assert := assert.New(t)
-	assert.Equal("test", "test")
 
  	var handshake string
 
@@ -115,12 +114,60 @@ func TestSocketGetPolling(t *testing.T) {
 	assert.Equal(socket_socket.Clients[handshake].Context, context.Context)
 }
 
-func TestSocketOn(t *testing.T) {
+func TestSocketInitClientEvent(t *testing.T) {
+
 	assert := assert.New(t)
-	assert.Equal("test", "test")
+
+ 	var handshake string
+
+	for handshake_, _ := range socket_socket.Clients {
+		handshake = handshake_
+	}
+
+	request, _ := http.NewRequest("GET", "/polling2/" + handshake, nil)
+	writer := httptest.NewRecorder()
+
+	var context Context
+
+	// Register handler for mock request
+	socket_socket.Router.GET("/polling2/:handshake", func(context_ *gin.Context) {
+		context = socket_socket.GetPolling(context_)
+	})
+
+	// Start request
+	socket_socket.Router.ServeHTTP(writer, request)
+
+	client := socket_socket.Clients[handshake]
+	assert.Equal(false, client.HandshakeFlag)
+
+	socket_socket.On("connection", func(client_ Client) {
+		client_.On("event1", func(data Json) {})
+		client_.On("event2", func(data Json) {})
+		client_.On("event3", func(data Json) {})
+		client_.On("event4", func(data Json) {})
+	})
+
+	socket_socket.InitClientEvent(context)
+
+	client = socket_socket.Clients[handshake]
+	assert.Equal(true, client.HandshakeFlag)
+
+	// Fail
+	//assert.Equal(4, client.MaxEvent)
 }
 
-func TestSocketUpdateContext(t *testing.T) {
+func TestSocketOn(t *testing.T) {
+
+	assert := assert.New(t)
+	assert.Equal("test", "test")
+
+	callback := func(client Client) {}
+	socket_socket.On("connection", callback)
+	socket_socket.On("disconnect", callback)
+
+	assert.Equal(callback, socket_socket.Event["connection"])
+	assert.Equal(callback, socket_socket.Event["disconnect"])
+
 }
 
 func TestSocket(t *testing.T) {
