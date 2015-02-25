@@ -91,3 +91,23 @@ func (client Client) Broadcast(event string, data Json) {
 
 	}
 }
+
+// Broadcast event to all client
+//
+// client.BroadcastAll("event", Json {
+// 		"key1" : "value1",
+// 		"key2" : "value2",
+// })
+func (client Client) BroadcastAll(event string, data Json) {
+	for handshake, client_ := range client.Socket.Clients {
+
+		// Parallel Broadcasting
+		go func(handshake string, client_ Client, event string, data Json) {
+			client_.Output <- Json {
+					"event": event,
+					"data" : data,
+			}
+		} (handshake, client_, event, data)
+
+	}
+}

@@ -62,23 +62,18 @@ func main() {
 		})
 	})
 
-	//list := make([] User, 0)
+	list := make([] User, 0)
 
 	socket.On("connection", func(client Client) {
 		client.On("init", func(data Json) {
-			fmt.Println(data)
 
-			/*
 			_ = append(list, User {
-				Name: "abc",
-			})*/
+				Name: data["username"].(string),
+			})
 
-			//fmt.Println(list)
-
-			/*
-			client.Broadcast("listchat", Json {
+			client.BroadcastAll("listchat", Json {
 				"users" : list,
-			})*/
+			})
 		})
 	})
 
