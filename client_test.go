@@ -31,16 +31,15 @@ import (
 	"testing"
 	"github.com/stretchr/testify/assert"
 	"container/list"
-	//"fmt"
+	"time"
 )
 
-func createClient() (Client, string) {
-
-	socket := Socket {
+var socket = Socket {
 		Port : 3000,
 		Interval: 60,
-	}
+}
 
+func createClient() Client {
 	handshake := random()
 	output    := make(chan Json, 10)
 	channel   := make(chan Context, 10)
@@ -57,13 +56,13 @@ func createClient() (Client, string) {
 		MaxEvent: 0,
 	}
 
-	return client, handshake
+	return client
 }
 
 func TestClientOn(t *testing.T) {
 
 	assert := assert.New(t)
-	client, _ := createClient()
+	client := createClient()
 
 	assert.NotNil(client)
 
@@ -80,7 +79,7 @@ func TestClientOn(t *testing.T) {
 func TestClientEmit(t *testing.T) {
 
 	assert := assert.New(t)
-	client, _ := createClient()
+	client := createClient()
 
 	assert.NotNil(client)
 
@@ -115,32 +114,95 @@ func TestClientEmit(t *testing.T) {
 func TestClientBroadcast(t *testing.T) {
 
 	assert := assert.New(t)
-	client, _ := createClient()
+	client := createClient()
 
 	assert.NotNil(client)
-	client.Socket.Initialize()
-	assert.NotNil(client.Socket.Clients)
-	assert.Equal(0, len(client.Socket.Clients))
+	socket.Initialize()
+	assert.NotNil(socket.Clients)
+	assert.Equal(0, len(socket.Clients))
+	socket.Clients[client.Handshake] = client
 
-	for i := 0; i < 10000; i++ {
-		client_, handshake := createClient()
-		client.Socket.Clients[handshake] = client_
+	num := 10000
+
+	for i := 0; i < num; i++ {
+		client_ := createClient()
+		socket.Clients[client_.Handshake] = client_
 	}
 
-	assert.Equal(10000, len(client.Socket.Clients))
+	client.Socket = socket
+
+	assert.Equal(num + 1, len(client.Socket.Clients))
 
 	client.Broadcast("test", Json {
 		"key1" : "value1",
 		"key2" : "value2",
 	})
 
-	for _, client_ := range client.Socket.Clients {
-		assert.Equal(Json {
-			"event" : "test",
-			"data"  : Json {
-				"key1" : "value1",
-				"key2" : "value2",
-			},
-		}, <- client_.Output)
+	times := 0
+
+	for handshake, client_ := range socket.Clients {
+		if client.Handshake != handshake {
+			go func(client_ Client) {
+				times ++
+				assert.Equal(Json {
+					"event" : "test",
+					"data"  : Json {
+						"key1" : "value1",
+						"key2" : "value2",
+					},
+				}, <- client_.Output)
+			} (client_)
+		}
 	}
+
+	// Waiting for all channel
+	time.Sleep(time.Second * 1)
+	assert.Equal(num, times)
+}
+
+func TestClientBroadcastAll(t *testing.T) {
+
+	assert := assert.New(t)
+	client := createClient()
+
+	assert.NotNil(client)
+	socket.Initialize()
+	assert.NotNil(socket.Clients)
+	assert.Equal(0, len(socket.Clients))
+	socket.Clients[client.Handshake] = client
+
+	num := 10000
+
+	for i := 0; i < num; i++ {
+		client_ := createClient()
+		socket.Clients[client_.Handshake] = client_
+	}
+
+	client.Socket = socket
+
+	assert.Equal(num + 1, len(client.Socket.Clients))
+
+	client.Broadcast("test", Json {
+		"key1" : "value1",
+		"key2" : "value2",
+	})
+
+	times := 0
+
+	for _, client_ := range socket.Clients {
+		go func(client_ Client) {
+			times ++
+			assert.Equal(Json {
+				"event" : "test",
+				"data"  : Json {
+					"key1" : "value1",
+					"key2" : "value2",
+				},
+			}, <- client_.Output)
+		} (client_)
+	}
+
+	// Waiting for all channel
+	time.Sleep(time.Second * 1)
+	assert.Equal(num + 1, times)
 }
