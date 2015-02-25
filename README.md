@@ -5,8 +5,7 @@ Real-time library for Go based on Long-Polling
 
 
 # Compatibility
-<a href="url"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/main-desktop.png" align="left" height="50"></a>
-
+<div><a href="url"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/main-desktop.png" align="left" height="50"></a></div>
 
 # Example
 Chat example (coming soon)
