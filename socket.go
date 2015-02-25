@@ -71,10 +71,11 @@ func (socket *Socket) Initialize() Socket {
 
 	// Route using Gin Framework
 	gin.SetMode(gin.DebugMode)
+	//gin.SetMode(gin.ReleaseMode)
 	socket.Router = gin.Default()
 
 	// Context
-	socket.Context = make(chan Context, 10)
+	socket.Context = make(chan Context)
 
 	// Event
 	socket.Event = make(map[string] func(client Client))
@@ -117,11 +118,6 @@ func (socket Socket) Template(template_directory string) {
 func (socket Socket) Static(route string, directory string) Socket {
 	socket.Router.Static(route, directory)
 	return socket
-}
-
-// Check polling request per connection
-func (socket Socket) LoopSocketEvent(context Context) {
-	socket.UpdateContext(context)
 }
 
 // Scan client events in the first handshake
@@ -243,7 +239,7 @@ func (socket Socket) Listen() Socket {
 
 	socket.Router.GET("/polling", func(_context *gin.Context) {
 		context := socket.GetConnection(_context)
-		socket.LoopSocketEvent(context)
+		socket.UpdateContext(context)
 	})
 
 	socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {

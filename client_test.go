@@ -34,9 +34,9 @@ import (
 	"time"
 )
 
-var socket = Socket {
-		Port : 3000,
-		Interval: 60,
+var socket_client = Socket {
+	Port : 3000,
+	Interval: 60,
 }
 
 func createClient() Client {
@@ -46,7 +46,7 @@ func createClient() Client {
 	event     := list.New()
 
 	client := Client {
-		Socket: socket,
+		Socket: socket_client,
 		Context: nil,
 		Output : output,
 		Channel: channel,
@@ -117,19 +117,19 @@ func TestClientBroadcast(t *testing.T) {
 	client := createClient()
 
 	assert.NotNil(client)
-	socket.Initialize()
-	assert.NotNil(socket.Clients)
-	assert.Equal(0, len(socket.Clients))
-	socket.Clients[client.Handshake] = client
+	socket_client.Initialize()
+	assert.NotNil(socket_client.Clients)
+	assert.Equal(0, len(socket_client.Clients))
+	socket_client.Clients[client.Handshake] = client
 
 	num := 10000
 
 	for i := 0; i < num; i++ {
 		client_ := createClient()
-		socket.Clients[client_.Handshake] = client_
+		socket_client.Clients[client_.Handshake] = client_
 	}
 
-	client.Socket = socket
+	client.Socket = socket_client
 
 	assert.Equal(num + 1, len(client.Socket.Clients))
 
@@ -140,7 +140,7 @@ func TestClientBroadcast(t *testing.T) {
 
 	times := 0
 
-	for handshake, client_ := range socket.Clients {
+	for handshake, client_ := range socket_client.Clients {
 		if client.Handshake != handshake {
 			go func(client_ Client) {
 				times ++
@@ -156,7 +156,7 @@ func TestClientBroadcast(t *testing.T) {
 	}
 
 	// Waiting for all channel
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Millisecond * 100)
 	assert.Equal(num, times)
 }
 
@@ -166,19 +166,19 @@ func TestClientBroadcastAll(t *testing.T) {
 	client := createClient()
 
 	assert.NotNil(client)
-	socket.Initialize()
-	assert.NotNil(socket.Clients)
-	assert.Equal(0, len(socket.Clients))
-	socket.Clients[client.Handshake] = client
+	socket_client.Initialize()
+	assert.NotNil(socket_client.Clients)
+	assert.Equal(0, len(socket_client.Clients))
+	socket_client.Clients[client.Handshake] = client
 
 	num := 10000
 
 	for i := 0; i < num; i++ {
 		client_ := createClient()
-		socket.Clients[client_.Handshake] = client_
+		socket_client.Clients[client_.Handshake] = client_
 	}
 
-	client.Socket = socket
+	client.Socket = socket_client
 
 	assert.Equal(num + 1, len(client.Socket.Clients))
 
@@ -189,7 +189,7 @@ func TestClientBroadcastAll(t *testing.T) {
 
 	times := 0
 
-	for _, client_ := range socket.Clients {
+	for _, client_ := range socket_client.Clients {
 		go func(client_ Client) {
 			times ++
 			assert.Equal(Json {
@@ -203,6 +203,6 @@ func TestClientBroadcastAll(t *testing.T) {
 	}
 
 	// Waiting for all channel
-	time.Sleep(time.Second * 1)
+	time.Sleep(time.Millisecond * 100)
 	assert.Equal(num + 1, times)
 }

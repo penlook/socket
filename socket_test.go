@@ -30,8 +30,50 @@ package socket
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
-	//"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"net/http/httptest"
+	//"fmt"
 )
+
+var socket_socket = Socket {
+	Port : 3000,
+	Interval: 60,
+}
+
+func TestSocketInitialize(t *testing.T) {
+	assert := assert.New(t)
+	socket_socket.Initialize()
+	assert.NotNil(socket_socket.Router)
+
+	assert.NotNil(socket_socket.Context)
+	assert.Equal(0, len(socket_socket.Context))
+
+	assert.NotNil(socket_socket.Event)
+	assert.Equal(0, len(socket_socket.Event))
+
+	assert.NotNil(socket_socket.Clients)
+	assert.Equal(0, len(socket_socket.Clients))
+}
+
+func TestSocketGetConnection(t *testing.T) {
+	assert := assert.New(t)
+
+	request, _ := http.NewRequest("GET", "/polling", nil)
+	writer := httptest.NewRecorder()
+
+	var context Context
+
+	socket_socket.Router.GET("/polling", func(context_ *gin.Context) {
+		context = socket_socket.GetConnection(context_)
+	})
+
+	socket_socket.Router.ServeHTTP(writer, request)
+	assert.Equal(true, (len(context.Handshake) == 20))
+}
+
+func TestSocketUpdateContext(t *testing.T) {
+}
 
 func TestSocket(t *testing.T) {
 
@@ -39,7 +81,7 @@ func TestSocket(t *testing.T) {
 	assert.Equal("Test", "Test")
 
 	// Implemting .. Mockup HTTP Request
-	
+
 	/*
 	socket := Socket {
 		Port: 3000,
