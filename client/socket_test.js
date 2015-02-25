@@ -3,19 +3,19 @@ var $ = QUnit;
 $.test("get option", function(assert) {
 
 	// Test 1
-	custom_option = {
+	var custom_option = {
 		key2 : "value3",
 		key3 : "value1",
 	};
 
-	default_option = {
+	var default_option = {
 		key1 : "value1",
 		key2 : "value2",
 		key3 : "value3",
 		key4 : "value4",
 	};
 
-	output = getOption(custom_option, default_option);
+	var output = getOption(custom_option, default_option);
 
 	assert.deepEqual(output, {
 		key1 : "value1",
@@ -109,7 +109,7 @@ $.test("create handshake", function(assert) {
 $.test("process response data", function(assert) {
 	this.socket = new Socket(3000);
 
-	data = {
+	var data = {
 		key1: "value1",
 		key2: "value2",
 		key3: "value3"
