@@ -36,4 +36,5 @@ func TestRandom(t *testing.T) {
 	assert := assert.New(t)
 	str := random()
 	assert.Equal(true, (len(str) == 20))
+	assert.Equal("test", "test")
 }
