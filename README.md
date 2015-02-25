@@ -3,8 +3,10 @@ Real-time library for Go based on Long-Polling
 
 [![Build Status](https://travis-ci.org/penlook/socket.svg?branch=master)](https://travis-ci.org/penlook/socket) [![GoDoc](https://godoc.org/github.com/penlook/socket?status.png)](https://godoc.org/github.com/penlook/socket) [![Software License](https://img.shields.io/badge/license-GNU-blue.svg?style=flat)](LICENSE.md) [![Author](http://img.shields.io/badge/author-penlook-red.svg?style=flat)](https://github.com/penlook)
 
+
 # Compatibility
-[[ https://raw.githubusercontent.com/alrra/browser-logos/master/main-desktop.png | height = 50px ]]
+<a href="url"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/main-desktop.png" align="left" height="50"></a>
+
 
 # Example
 Chat example (coming soon)
