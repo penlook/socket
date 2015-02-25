@@ -118,6 +118,7 @@ Socket.prototype  = {
             if (request.readyState != 4 || request.status != 200) return;
 
             var data = {}
+
             try {
                 data = JSON.parse(request.responseText);
             } catch (e) {
@@ -125,19 +126,20 @@ Socket.prototype  = {
                 return false;
             }
 
-            option.async = false;
             callback(context, data);
         };
 
         request.timeout = option.timeout
         request.ontimeout = function() {
-            call_timeout(context);
+            if (typeof call_timeout !== 'undefined')  {
+                call_timeout(context);
+            }
         };
 
         request.send(JSON.stringify(option.data));
     },
 
-    // Processor
+    // Call corresponding event to handle data
     process : function(data) {
         var item, event;
         for (item in this.events) {
@@ -201,6 +203,7 @@ Socket.prototype  = {
     // Pull data by using polling request
     pull: function() {
         if (typeof this.handshake === 'string') {
+
             var option = {
                 method: "GET",
                 url: "/polling/" + this.handshake,

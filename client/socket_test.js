@@ -39,11 +39,28 @@ $.test("get options", function(assert) {
 });
 
 $.test("synchronous request", function(assert) {
-	assert.equal("test", "test");
+	var option = {
+		url : "/polling",
+	};
+
+	this.socket.sync(this, option, function(socket, data) {
+		assert.equal(data.event, "connection");
+	});
 });
 
 $.test("asynchronous request", function(assert) {
-	assert.equal("test", "test");
+
+	// Asynchronous wating ...
+	var done = assert.async();
+
+	var option = {
+		url : "/polling",
+	};
+
+	this.socket.async(this, option, function(socket, data) {
+		assert.equal(data.event, "connection");
+		done();
+	});
 });
 
 $.test("create handshake", function(assert) {
