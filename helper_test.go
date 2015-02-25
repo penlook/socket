@@ -39,4 +39,5 @@ func TestRandom(t *testing.T) {
 	assert.Equal("test", "test")
 	assert.Equal("test", "test")
 	assert.Equal("test", "test")
+	assert.Equal("test", "test")
 }
