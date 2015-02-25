@@ -12,6 +12,10 @@ socket.on('join', function(data) {
 	console.log(data)
 })
 
+socket.on('listchat', function(data) {
+	console.log(data)
+})
+
 socket.emit('init', {
     username: username
 });

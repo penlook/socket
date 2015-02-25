@@ -64,9 +64,11 @@ func main() {
 
 	list := make([] User, 0)
 
+	// Start point
 	socket.On("connection", func(client Client) {
 		client.On("init", func(data Json) {
 
+			// Append new user into list chat
 			_ = append(list, User {
 				Name: data["username"].(string),
 			})
@@ -77,6 +79,7 @@ func main() {
 		})
 	})
 
+	// End point
 	socket.On("disconnect", func(client Client) {
 		fmt.Println("Connection is corrupt !")
 	})
