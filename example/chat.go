@@ -69,7 +69,7 @@ func main() {
 		client.On("init", func(data Json) {
 
 			// Append new user into list chat
-			_ = append(list, User {
+			list = append(list, User {
 				Name: data["username"].(string),
 			})
 

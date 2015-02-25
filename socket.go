@@ -36,7 +36,7 @@ import (
 	"time"
 )
 
-// Transport Long polling - Implemented
+// Long polling - Implemented
 const LongPolling int = 0
 
 // Web socket - Not yet implemented
@@ -66,10 +66,10 @@ type Socket struct {
 	Router *gin.Engine
 }
 
-// Initiazlie for socket
+// Initialize for socket
 func (socket *Socket) Initialize() Socket {
 
-	// Route
+	// Route using Gin Framework
 	gin.SetMode(gin.DebugMode)
 	socket.Router = gin.Default()
 
@@ -148,7 +148,7 @@ func (socket Socket) SubmitClientEvent(context Context) {
 	// Temporary type casting
 	event_data_raw := pkg["data"].(map[string] interface{})
 
-	// Convert from map[string] interface{} to Json type
+	// Convert from map[string] interface {} to Json type
 	event_data := Json {}
 	for key, value := range event_data_raw {
 		event_data[key] = value
