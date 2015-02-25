@@ -32,6 +32,10 @@ import (
 	"fmt"
 )
 
+type User struct {
+	Name string
+}
+
 func main() {
 
 	socket := Socket {
@@ -58,11 +62,23 @@ func main() {
 		})
 	})
 
+	//list := make([] User, 0)
+
 	socket.On("connection", func(client Client) {
 		client.On("init", func(data Json) {
-			client.Broadcast("listchat", Json {
+			fmt.Println(data)
 
-			})
+			/*
+			_ = append(list, User {
+				Name: "abc",
+			})*/
+
+			//fmt.Println(list)
+
+			/*
+			client.Broadcast("listchat", Json {
+				"users" : list,
+			})*/
 		})
 	})
 
