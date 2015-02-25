@@ -6,7 +6,7 @@ Real-time library for Go based on Long-polling
 
 # Compatibility
 Long-polling request support all major browsers
-<div><a href="https://github.com/penlook"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/main-desktop.png" align="left" height="50"></a></div>
+<div><a href="https://github.com/penlook/socket"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/main-desktop.png" align="left" height="50"></a></div>
 
 <br></br>
 <br></br>
