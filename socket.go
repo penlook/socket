@@ -182,8 +182,8 @@ func (socket Socket) GetConnection(context *gin.Context) Context {
 
 	client := Client {
 		Socket: socket,
-		Context: context,
 		Output : output,
+		Context: context,
 		Channel: channel,
 		Event: event,
 		Handshake: handshake,

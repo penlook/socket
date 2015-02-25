@@ -49,9 +49,9 @@ type Client struct {
 // client.On("event", func(client Client) {
 // 		// TODO
 // })
-func (client Client) On(event string, callback func(data Json)) {
+func (client *Client) On(event string, callback func(data Json)) {
 	client.MaxEvent = client.MaxEvent + 1
-	client.Event.PushBack( Event {
+	client.Event.PushBack(Event {
 		Id : client.MaxEvent,
 		Name : event,
 		Callback : callback,
