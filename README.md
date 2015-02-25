@@ -11,11 +11,7 @@ Real-time library for Go based on Long-Polling
 <br></br>
 
 # Example
-Chat example (coming soon)
 
-<br></br>
-
-# Documentation
 Server
 ```go
 import (
