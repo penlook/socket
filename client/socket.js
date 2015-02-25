@@ -41,6 +41,23 @@ var get = function(variable, default_value) {
 }
 
 /**
+ * Get option from custom and default option
+ *
+ * @param  object options Custom options
+ * @param  object options_default Default options
+ * @return object Finnal option
+ */
+var getOption = function(options, options_default) {
+
+    // Override option value
+    for (var key in options) {
+        options_default[key] = options[key];
+    }
+
+    return options_default;
+};
+
+/**
  * Socket client
  *
  * @param port int default 80
@@ -59,7 +76,14 @@ var Socket  = function(port) {
 Socket.prototype  = {
 
     // Synchronous request
-    sync : function(context, option, callback) {
+    sync : function(context, option_, callback) {
+
+        var option = getOption(option_ , {
+            url: "/",
+            data: {},
+            method: "GET",
+        });
+
         var request = new XMLHttpRequest();
         request.open(option.method, option.url, false);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
@@ -76,7 +100,15 @@ Socket.prototype  = {
     },
 
     // Asynchronous request
-    async : function(context, option, callback, call_timeout) {
+    async : function(context, option_, callback, call_timeout) {
+
+        var option = getOption(option_ , {
+            url: "/",
+            data: {},
+            method: "GET",
+            timeout : 1000 * 60,
+        });
+
         option.timeout = get(option.timeout, 1000*600);
 
         var request = new XMLHttpRequest();
@@ -122,6 +154,15 @@ Socket.prototype  = {
             name : event,
             callback : callback
         });
+    },
+
+    // Remove event
+    removeEvent : function(event) {
+
+    },
+
+    removeAllEvent : function() {
+
     },
 
     // Remove event

@@ -3,7 +3,6 @@ Real-time library for Go based on Long-polling
 
 [![Build Status](https://travis-ci.org/penlook/socket.svg?branch=master)](https://travis-ci.org/penlook/socket) [![GoDoc](https://godoc.org/github.com/penlook/socket?status.png)](https://godoc.org/github.com/penlook/socket) [![Software License](https://img.shields.io/badge/license-GNU-blue.svg?style=flat)](LICENSE.md) [![Author](http://img.shields.io/badge/author-penlook-red.svg?style=flat)](https://github.com/penlook)
 
-
 # Compatibility
 Long-polling request support all major browsers
 <div><a href="https://github.com/penlook/socket"><img src="https://raw.githubusercontent.com/alrra/browser-logos/master/main-desktop.png" align="left" height="50"></a></div>
