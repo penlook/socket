@@ -47,7 +47,7 @@ var get = function(variable, default_value) {
  */
 var Socket  = function(port) {
     this.port = get(port, 80);
-    this.events = []
+    this.events = [];
     this.connect();
 };
 
