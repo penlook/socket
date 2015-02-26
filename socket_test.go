@@ -196,33 +196,71 @@ func toJson(data io.Reader) Json {
 // Step 1: Initialize new polling connection
 // Step 2: Setup event in server
 // Step 3: Emit new event to server
-// Step 4: Client recieve event from server
+// Step 4: Client receive event from server
 func TestSocketClientServer(t *testing.T) {
 	assert := assert.New(t)
 
+	socket_socket.Initialize()
+
 	// Step 1
 	// Initialize polling connection
-	socket_socket.Router.GET("/polling_test_socket_1", socket_socket.ServePooling())
-	response := makeRequest("GET", "/polling_test_socket_1", Json {})
+	socket_socket.Router.GET("/polling_test_socket", socket_socket.ServePooling())
+	response := makeRequest("GET", "/polling_test_socket", Json {})
 	assert.NotNil(response)
 
 	data := toJson(response.Body)
 	assert.NotNil(data)
 
-	handshake := data["data"].(map[string] interface {})["handshake"]
+	handshake := data["data"].(map[string] interface {})["handshake"].(string)
 	assert.Equal(true, len(handshake) == 20)
 
 	// Step 2
 	// Install event in server
+	// Old callback will be overrided when rewrite 'On("connection")'
 	socket_socket.On("connection", func(client Client) {
-		client.On("")
+		client.On("init", func(data Json) {
+			assert.Equal(Json{
+				"init_key1" : "ABCDEF012345",
+				"init_key2" : "XYZ12345",
+			}, data)
+		})
+		client.On("abc", func(data Json) {
+			assert.Equal(Json{
+				"abc_key1" : "ABCDEF012345",
+				"abc_key2" : "XYZ12345",
+			}, data)
+		})
 	})
 
+	// Step 3
 	// Using exist handshake to emit new data
-	socket_socket.Router.GET("/polling_test_socket_2/:handshake", socket_socket.ServePostHandshake())
-	response := makeRequest("GET", "/polling_test_socket_1", Json {
-		"event" : ""
+	socket_socket.Router.GET ("/polling_test_socket/:handshake", socket_socket.ServeGetHandshake())
+	socket_socket.Router.POST("/polling_test_socket/:handshake", socket_socket.ServePostHandshake())
+
+	// Handle first event
+	response = makeRequest("POST", "/polling_test_socket/" + handshake, Json {
+		"event" : "init",
+		"data" : Json {
+			"init_key1" : "ABCDEF012345",
+			"init_key2" : "XYZ12345",
+		},
 	})
+
+	assert.NotNil(response)
+
+	// Handle second event
+	response = makeRequest("POST", "/polling_test_socket/" + handshake, Json {
+		"event" : "abc",
+		"data" : Json {
+			"abc_key1" : "ABCDEF012345",
+			"abc_key2" : "XYZ12345",
+		},
+	})
+
+	assert.NotNil(response)
+
+	fmt.Println()
+
 
 	/*
 	socket := Socket {
