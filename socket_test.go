@@ -33,7 +33,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/http/httptest"
-	//"fmt"
+	"io"
+	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 var socket_socket = Socket {
@@ -63,7 +66,7 @@ func TestSocketGetConnection(t *testing.T) {
 	assert := assert.New(t)
 
 	// Mockup HTTP Request
-	request, _ := http.NewRequest("GET", "/polling", nil)
+	request, _ := http.NewRequest("GET", "/polling_test_1", nil)
 
 	// Create request recorder
 	writer := httptest.NewRecorder()
@@ -71,7 +74,7 @@ func TestSocketGetConnection(t *testing.T) {
 	var context Context
 
 	// Register handler for mock request
-	socket_socket.Router.GET("/polling", func(context_ *gin.Context) {
+	socket_socket.Router.GET("/polling_test_1", func(context_ *gin.Context) {
 		context = socket_socket.GetConnection(context_)
 	})
 
@@ -96,13 +99,13 @@ func TestSocketGetPolling(t *testing.T) {
 
 	// Mockup HTTP Request
 
-	request, _ := http.NewRequest("GET", "/polling/" + handshake, nil)
+	request, _ := http.NewRequest("GET", "/polling_test_2/" + handshake, nil)
 	writer := httptest.NewRecorder()
 
 	var context Context
 
 	// Register handler for mock request
-	socket_socket.Router.GET("/polling/:handshake", func(context_ *gin.Context) {
+	socket_socket.Router.GET("/polling_test_2/:handshake", func(context_ *gin.Context) {
 		context = socket_socket.GetPolling(context_)
 	})
 
@@ -124,13 +127,13 @@ func TestSocketInitClientEvent(t *testing.T) {
 		handshake = handshake_
 	}
 
-	request, _ := http.NewRequest("GET", "/polling2/" + handshake, nil)
+	request, _ := http.NewRequest("GET", "/polling_test_3/" + handshake, nil)
 	writer := httptest.NewRecorder()
 
 	var context Context
 
 	// Register handler for mock request
-	socket_socket.Router.GET("/polling2/:handshake", func(context_ *gin.Context) {
+	socket_socket.Router.GET("/polling_test_3/:handshake", func(context_ *gin.Context) {
 		context = socket_socket.GetPolling(context_)
 	})
 
@@ -156,6 +159,7 @@ func TestSocketInitClientEvent(t *testing.T) {
 	//assert.Equal(4, client.MaxEvent)
 }
 
+// Test register event
 func TestSocketOn(t *testing.T) {
 
 	assert := assert.New(t)
@@ -167,15 +171,58 @@ func TestSocketOn(t *testing.T) {
 
 	assert.Equal(callback, socket_socket.Event["connection"])
 	assert.Equal(callback, socket_socket.Event["disconnect"])
-
 }
 
-func TestSocket(t *testing.T) {
+// Create mockup HTTP Request
+func makeRequest(method, url string, data Json) *httptest.ResponseRecorder {
+	query, _ := json.Marshal(data)
+	request, _ := http.NewRequest(method, url, bytes.NewBuffer(query))
+	request.Header.Set("Content-Type", "application/json")
+	writer := httptest.NewRecorder()
+	socket_socket.Router.ServeHTTP(writer, request)
+	return writer
+}
 
+// Convert string to JSON type
+func toJson(data io.Reader) Json {
+	decoder := json.NewDecoder(data)
+	var json Json
+	decoder.Decode(&json)
+	return json
+}
+
+// Integration Test
+//
+// Step 1: Initialize new polling connection
+// Step 2: Setup event in server
+// Step 3: Emit new event to server
+// Step 4: Client recieve event from server
+func TestSocketClientServer(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal("Test", "Test")
 
-	// Implemting .. Mockup HTTP Request
+	// Step 1
+	// Initialize polling connection
+	socket_socket.Router.GET("/polling_test_socket_1", socket_socket.ServePooling())
+	response := makeRequest("GET", "/polling_test_socket_1", Json {})
+	assert.NotNil(response)
+
+	data := toJson(response.Body)
+	assert.NotNil(data)
+
+	handshake := data["data"].(map[string] interface {})["handshake"]
+	assert.Equal(true, len(handshake) == 20)
+
+	// Step 2
+	// Install event in server
+	socket_socket.On("connection", func(client Client) {
+		client.On("")
+	})
+
+	// Using exist handshake to emit new data
+	socket_socket.Router.GET("/polling_test_socket_2/:handshake", socket_socket.ServePostHandshake())
+	response := makeRequest("GET", "/polling_test_socket_1", Json {
+		"event" : ""
+	})
 
 	/*
 	socket := Socket {
