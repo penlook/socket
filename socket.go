@@ -31,7 +31,6 @@ import (
 	"container/list"
 	"github.com/gin-gonic/gin"
 	"strconv"
-	"net/http"
 	"encoding/json"
 	"time"
 	//"fmt"
@@ -236,35 +235,37 @@ func (socket Socket) Response(context Context) {
 	}
 }
 
-// Listen socket
-func (socket Socket) Listen() Socket {
-
-	socket.Router.GET("/polling", func(_context *gin.Context) {
+func (socket Socket) ServePooling() gin.HandlerFunc {
+	return func(_context *gin.Context) {
 		context := socket.GetConnection(_context)
 		socket.UpdateContext(context)
-	})
+	}
+}
 
-	socket.Router.GET("/polling/:handshake", func(_context *gin.Context) {
-		handshake := _context.Params.ByName("handshake")
-		if handshake == "" {
-			return
-		}
+func (socket Socket) ServeGetHandshake() gin.HandlerFunc {
+	return func(_context *gin.Context) {
 		context := socket.GetPolling(_context)
 		socket.InitClientEvent(context)
 		context.Channel <- context
 		socket.Response(context)
-	})
+	}
+}
 
-	socket.Router.POST("/polling/:handshake", func(_context *gin.Context) {
-		handshake := _context.Params.ByName("handshake")
-		if handshake == "" {
-			return
-		}
+func (socket Socket) ServePostHandshake() gin.HandlerFunc {
+	return func(_context *gin.Context) {
 		context := socket.GetPolling(_context)
 		socket.SubmitClientEvent(context)
 		context.Channel <- context
-	})
+	}
+}
 
-	http.ListenAndServe(":" + strconv.Itoa(socket.Port), socket.Router)
+// Listen HTTP Request
+func (socket Socket) Listen() Socket {
+
+	socket.Router.GET ("/polling"           , socket.ServePooling())
+	socket.Router.GET ("/polling/:handshake", socket.ServeGetHandshake())
+	socket.Router.POST("/polling/:handshake", socket.ServePostHandshake())
+
+	socket.Router.Run(":" + strconv.Itoa(socket.Port))
 	return socket
 }
