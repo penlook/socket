@@ -6,10 +6,10 @@ dart:
     - stable
 
 go:
-  - 1.4
+    - 1.4
 
 with_content_shell: true
 
 install:
-  - go get -v ./...
-  - go get github.com/stretchr/testify/assert
+    - go get -v ./...
+    - go get github.com/stretchr/testify/assert
