@@ -2,10 +2,12 @@ language:
   - dart
   - go
 
-go:
-  - 1.4
-
 with_content_shell: true
+
 install:
+    - export GOPATH=$HOME
     - go get -v ./...
     - go get github.com/stretchr/testify/assert
+
+script:
+   - go test
