@@ -8,6 +8,8 @@ install:
     - . ./travis.sh
     - go get -v ./...
     - go get github.com/stretchr/testify/assert
+    - (cd ./client/dart && pub get && pub global activate test_runner)
 
 script:
     - go test
+    - (cd ./client/dart && pub global run test_runner)
