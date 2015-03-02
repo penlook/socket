@@ -62,8 +62,10 @@ var getOption = function(options, options_default) {
  *
  * @param port int default 80
  */
-var Socket  = function(port) {
+var Socket  = function(server, port) {
+    this.server = "http://" + get(server, "localhost");
     this.port = get(port, 80);
+    this.url = this.server + ":" + this.port;
     this.events = [];
     this.connect();
 };
@@ -85,14 +87,14 @@ Socket.prototype  = {
         });
 
         var request = new XMLHttpRequest();
-        request.open(option.method, option.url, false);
+        request.open(option.method, this.url + option.url, false);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         request.send(option.data);
 
         try {
             data = JSON.parse(request.responseText);
         } catch (e) {
-            console.log(e);
+            throw e;
             return false;
         }
 
@@ -112,7 +114,7 @@ Socket.prototype  = {
         option.timeout = get(option.timeout, 1000*600);
 
         var request = new XMLHttpRequest();
-        request.open(option.method, option.url);
+        request.open(option.method, this.url + option.url);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         request.onreadystatechange = function () {
             if (request.readyState != 4 || request.status != 200) return;

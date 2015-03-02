@@ -7,3 +7,5 @@ go:
 install:
   - go get -v ./...
   - go get github.com/stretchr/testify/assert
+  - (cd server; go build; sudo ./server install; sudo ./server start)
+  - sudo netstat -tulpn

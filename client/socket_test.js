@@ -26,6 +26,9 @@
  */
 
 var $ = QUnit;
+var socket = function() {
+	return new Socket("52.10.223.209", 3000);
+};
 
 $.test("get option", function(assert) {
 
@@ -93,7 +96,7 @@ $.test("get option", function(assert) {
 });
 
 $.test("synchronous request", function(assert) {
-	this.socket = new Socket(3000);
+	this.socket = socket();
 
 	var option = {
 		url : "/polling",
@@ -102,10 +105,11 @@ $.test("synchronous request", function(assert) {
 	this.socket.sync(this, option, function(socket, data) {
 		assert.equal(data.event, "connection");
 	});
+
 });
 
 $.test("asynchronous request", function(assert) {
-	this.socket = new Socket(3000);
+	this.socket = socket();
 
 	// Asynchronous wating ...
 	var done = assert.async();
@@ -121,7 +125,7 @@ $.test("asynchronous request", function(assert) {
 });
 
 $.test("create handshake", function(assert) {
-	this.socket = new Socket(3000);
+	this.socket = socket();
 
 	// Handshake was created
 	assert.ok(true, typeof this.socket.handshake !== 'undefined');
@@ -134,7 +138,7 @@ $.test("create handshake", function(assert) {
 });
 
 $.test("process response data", function(assert) {
-	this.socket = new Socket(3000);
+	this.socket = socket();
 
 	var data = {
 		key1: "value1",
@@ -157,7 +161,7 @@ $.test("process response data", function(assert) {
 });
 
 $.test("push data to server", function(assert) {
-	this.socket = new Socket(3000);
+	this.socket = socket();
 	var done = assert.async();
 
 	this.socket.push(this, {
