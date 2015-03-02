@@ -5,7 +5,6 @@ language:
 with_content_shell: true
 
 install:
-    - eval "$(gimme 1.4.1)"
     - export GOPATH=$HOME/gopath:
     - export PATH=$HOME/gopath/bin:$PATH
     - mkdir -p $HOME/gopath/src/github.com/penlook/socket
