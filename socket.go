@@ -259,8 +259,18 @@ func (socket Socket) ServePostHandshake() gin.HandlerFunc {
 	}
 }
 
+func (socket Socket) SetAllowCrossDomain() {
+	socket.Router.Use(func(c *gin.Context) {
+        c.Writer.Header().Set("Content-Type", "application/json")
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+        c.Next()
+    })
+}
+
 // Listen HTTP Request
 func (socket Socket) Listen() Socket {
+	socket.SetAllowCrossDomain()
 
 	socket.Router.GET ("/polling"           , socket.ServePooling())
 	socket.Router.GET ("/polling/:handshake", socket.ServeGetHandshake())
