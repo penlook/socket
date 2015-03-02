@@ -1,10 +1,10 @@
 language:
-  - dart
   - go
+  - dart
 
 with_content_shell: true
 
 install:
-    - export GOPATH=$TRAVIS_BUILD_DIR
+    - echo $GOPATH
     - go get -v ./...
     - go get github.com/stretchr/testify/assert
