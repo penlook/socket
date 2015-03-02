@@ -1,6 +1,6 @@
 language:
-  - go
   - dart
+  - go
 
 go:
   - 1.4
