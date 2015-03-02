@@ -5,9 +5,6 @@ language:
 with_content_shell: true
 
 install:
-    - export GOPATH=$HOME
+    - export GOPATH=$TRAVIS_BUILD_DIR
     - go get -v ./...
     - go get github.com/stretchr/testify/assert
-
-script:
-   - go test
