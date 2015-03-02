@@ -1,10 +1,10 @@
 language:
-	- go
-	- dart
+  - go
+  - dart
+
 go:
-    - 1.4
-dart:
-    - stable
+  - 1.4
+
 with_content_shell: true
 install:
     - go get -v ./...
