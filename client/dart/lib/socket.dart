@@ -32,4 +32,12 @@ import "dart:html";
 
 class Socket {
 
+    String port;
+    String host;
+    String protocol;
+
+    Socket(String host) {
+
+    }
+
 }
