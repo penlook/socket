@@ -12,4 +12,4 @@ install:
 
 script:
     - go test
-    - (cd ./client/dart && pub global run test_runner)
+    - (cd ./client/dart && xvfb-run -s '-screen 0 1024x768x24' pub global run test_runner --disable-ansi)
