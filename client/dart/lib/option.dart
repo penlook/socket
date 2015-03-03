@@ -30,11 +30,50 @@ part of socket;
 
 class Option {
 
+    /**
+     * HTTP Method
+     *
+     * @var string
+     */
     String method;
+    String get Method => method;
+    set Method(String method_) => method = method_;
+
+    /**
+     * URL
+     *
+     * @var string
+     */
     String url;
+    String get Url => url;
+    set Url(String url_) => url = url_;
+
+    /**
+     * Data package
+     *
+     * @var string
+     */
     String data;
+    String get Data => data;
+    set Data(String data_) => data = data_;
+
+    /**
+     * Request timeout
+     *
+     * @var int
+     */
     int timeout;
+    int get Timeout => timeout;
+    set Timeout(int timeout_) => timeout = timeout_;
+
+    /**
+     * Asynchronous request
+     *
+     * @var bool
+     */
     bool async;
+    bool get Async => async;
+    set Async(bool async_) => async = async_;
 
     /**
      * Option constructor
@@ -58,45 +97,4 @@ class Option {
         this.timeout = timeout;
         this.async = async;
     }
-
-    /**
-     * HTTP Method
-     *
-     * @var string
-     */
-    String get Method => method;
-    set Method(String method_) => method = method_;
-
-    /**
-     * URL
-     *
-     * @var string
-     */
-    String get Url => url;
-    set Url(String url_) => url = url_;
-
-    /**
-     * Data package
-     *
-     * @var string (json)
-     */
-    String get Data => data;
-    set Data(String data_) => data = data_;
-
-    /**
-     * Request timeout
-     *
-     * @var int
-     */
-    int get Timeout => timeout;
-    set Timeout(int timeout_) => timeout = timeout_;
-
-    /*
-     * Asynchronous mode
-     *
-     * @var bool
-     */
-    bool get Async => async;
-    set Async(bool async_) => async = async_;
-
 }

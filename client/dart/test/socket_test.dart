@@ -31,47 +31,42 @@ library socket.test;
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 import 'package:socket/socket.dart';
+import 'dart:async';
 
 void main() {
 
     useHtmlConfiguration();
 
-    test("socket constructor", () {
+    test("socket default constructor", () {
 
         var socket = new Socket();
-
-        expect("localhost", socket.Host);
-        expect(80, socket.Port);
-
-        socket = new Socket(host:"192.168.2.1");
-        expect("192.168.2.1", socket.Host);
-        expect(80, socket.Port);
-
-        socket = new Socket(host:"127.0.0.1", port: 3000);
-        expect("127.0.0.1", socket.Host);
-        expect(3000, socket.Port);
+        expect(socket.Host, "localhost");
+        expect(socket.Port, 80);
 
     });
 
-    test("synchronous request",() {
+    test("socket custom constructor", () {
 
-        var socket = new Socket();
-        expect("test", "test");
-
-    });
-
-    test("asynchronous request",() {
-
-        var socket = new Socket();
-        expect("test", "test");
+        var socket = new Socket(host:"127.0.0.1", port: 3000);
+        expect(socket.Host, "127.0.0.1");
+        expect(socket.Port, 3000);
 
     });
 
+    test("socket connect", () {
 
-    test("asynchronous request",() {
+        var socket = new Socket(host: "localhost", port: 1234);
+        socket.connect();
 
-        var socket = new Socket();
-        expect("test", "test");
+        new Timer(new Duration(milliseconds: 3000), expectAsync(() {
+            print("Handshake is");
+            print(socket.Handshake);
+        }));
+
+        /*new Timer(new Duration(milliseconds:2000),() {
+            expect(socket.Handshake, isNotNull);
+            expect(socket.Handshake, hasLength(equals(20)));
+        });*/
 
     });
 

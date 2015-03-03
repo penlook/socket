@@ -29,6 +29,7 @@
 library socket;
 
 import "dart:html";
+import "dart:convert";
 
 part "transport.dart";
 part "polling.dart";
@@ -54,6 +55,8 @@ class Socket {
      * @var string http | https
      */
     String protocol;
+    String get Protocol => protocol;
+    set Protocol(String protocol_) => protocol = protocol_;
 
     /**
      * Host name
@@ -61,6 +64,8 @@ class Socket {
      * @var string
      */
     String host;
+    String get Host => host;
+    set Host(String host_) => host = host_;
 
     /**
      * Server port
@@ -68,6 +73,8 @@ class Socket {
      * @var int
      */
     int port;
+    int get Port => port;
+    set Port(int port_) => port = port_;
 
     /**
      * Socket server url
@@ -75,6 +82,17 @@ class Socket {
      * @var string
      */
     String url;
+    String get Url => url;
+    set Url(String url_) => url = url_;
+
+    /**
+     * Handshake string
+     *
+     * @var string (hash)
+     */
+    String handshake;
+    String get Handshake => handshake;
+    set Handshake(String hanshake_) => handshake = hanshake_;
 
     /**
      * Socket contructor
@@ -94,49 +112,87 @@ class Socket {
         this.url = protocol + "://" + host + ":" + port.toString();
     }
 
-    String get Protocol => this.protocol;
-    String get Url      => this.url;
-    String get Host     => this.host;
-    int    get Port     => this.port;
-
-    syncRequest(Socket context, Option option, Function callback) {
+    /**
+     * HTTP Synchronous request
+     *
+     * @param Socket context
+     * @param Option option
+     * @param Function callback
+     */
+    void syncRequest(Socket context, Option option, Function callback(Socket context, Map data)) {
 
         // Initialize new HTTP Request
         HttpRequest request = new HttpRequest();
-        request.open(option.Method, option.Url, async: option.Async);
-        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+        print(option.Method);
+
+        request.open(option.Method, this.Url + option.Url, async: false);
         request.send(option.Data);
+
+        Map data = null;
+
+        print(request.responseText);
+
+        try {
+           data = JSON.decode(request.responseText);
+        } catch (e) {
+           throw e;
+       }
+
+       callback(context, data);
     }
 
-    asyncRequest(Socket context, Option option, Function callback) {
-
-    }
-
-    processResponse() {
-
-    }
-
-    on() {
-
-    }
-
-    emit() {
-
-    }
-
-    remove() {
-
-    }
-
-    connect() {
-
-    }
-
-    pull() {
+    /**
+     * HTTP Asynchronous request
+     *
+     * @param Socket context
+     * @param Option option
+     * @param Function callback
+     */
+    void asyncRequest(Socket context, Option option, Function callback) {
 
     }
 
-    push() {
+    void sendRequest(Socket context, Option option, Function callback) {
+        option.Async ?
+            this.asyncRequest(context, option, callback) :
+                this.syncRequest(context, option, callback);
+    }
+
+    void processResponse() {
+
+    }
+
+    void on() {
+
+    }
+
+    void emit() {
+
+    }
+
+    void remove() {
+
+    }
+
+    void connect() {
+        var option = new Option(url: "/polling");
+
+        // Synchronous request
+        option.Async = false;
+
+        this.sendRequest(this, option, (Socket socket, Map data) {
+            if (data["event"] == "connection") {
+                print(data["data"]);
+            }
+        });
+    }
+
+    void pull() {
+
+    }
+
+    void push() {
 
     }
 
