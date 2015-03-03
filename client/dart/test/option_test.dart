@@ -26,7 +26,7 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-library socket.test;
+library option.test;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
@@ -36,43 +36,30 @@ void main() {
 
     useHtmlConfiguration();
 
-    test("socket constructor", () {
+    test("option constructor", () {
 
-        var socket = new Socket();
+        // Test default constructor
+        var option = new Option();
+        expect("GET", option.Method);
+        expect("", option.Url);
+        expect("{}", option.Data);
+        expect(60, option.Timeout);
+        expect(true, option.Async);
 
-        expect("localhost", socket.Host);
-        expect(80, socket.Port);
+        // Test custom constructor
+        option = new Option(
+                     method: "POST",
+                     url:"/abc",
+                     data: "{key:value}",
+                     timeout: 20,
+                     async: false
+                 );
 
-        socket = new Socket(host:"192.168.2.1");
-        expect("192.168.2.1", socket.Host);
-        expect(80, socket.Port);
-
-        socket = new Socket(host:"127.0.0.1", port: 3000);
-        expect("127.0.0.1", socket.Host);
-        expect(3000, socket.Port);
-
-    });
-
-    test("synchronous request",() {
-
-        var socket = new Socket();
-        expect("test", "test");
-
-    });
-
-    test("asynchronous request",() {
-
-        var socket = new Socket();
-        expect("test", "test");
-
-    });
-
-
-    test("asynchronous request",() {
-
-        var socket = new Socket();
-        expect("test", "test");
-
+        expect("POST", option.Method);
+        expect("/abc", option.Url);
+        expect("{key:value}", option.Data);
+        expect(20, option.Timeout);
+        expect(false, option.Async);
     });
 
 }

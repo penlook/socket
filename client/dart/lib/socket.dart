@@ -46,97 +46,98 @@ part "option.dart";
  * @link       http://github.com/penlook
  * @since      Class available since Release 1.0
  */
-class Socket extends Transport {
+class Socket {
 
     /**
      * Socket protocol
-     * 
+     *
      * @var string http | https
      */
     String protocol;
-    
+
     /**
      * Host name
-     * 
-     * @var string 
+     *
+     * @var string
      */
-    String host;         
-    
+    String host;
+
     /**
      * Server port
-     * 
+     *
      * @var int
      */
-    int port;  
-    
+    int port;
+
     /**
      * Socket server url
-     * 
+     *
      * @var string
      */
     String url;
 
     /**
      * Socket contructor
-     * 
+     *
      * @param string protocol
      * @param string localhost
-     * @param int    port 80 
+     * @param int    port 80
      */
-    Socket({String protocol : "http", String host : "localhost", int port: 80}) {
-         this.host = host;
-         this.port = port;
-         this.protocol = "http";
-         this.url = protocol + "://" + host + ":" + port.toString();
+    Socket({
+        String protocol : "http",
+        String host : "localhost",
+        int port: 80
+    }) {
+        this.host = host;
+        this.port = port;
+        this.protocol = "http";
+        this.url = protocol + "://" + host + ":" + port.toString();
     }
-    
+
     String get Protocol => this.protocol;
     String get Url      => this.url;
     String get Host     => this.host;
-    int    get Port     => this.port;    
+    int    get Port     => this.port;
 
     syncRequest(Socket context, Option option, Function callback) {
-      
+
         // Initialize new HTTP Request
         HttpRequest request = new HttpRequest();
-        
-        request.open(options.data, url, async: false);
+        request.open(option.Method, option.Url, async: option.Async);
         request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        
-        request.send(jsonData);
-       
+        request.send(option.Data);
     }
-    
+
     asyncRequest(Socket context, Option option, Function callback) {
-      
+
     }
-    
+
     processResponse() {
-      
+
     }
-    
+
     on() {
-      
+
     }
-    
+
     emit() {
-      
+
     }
-    
+
     remove() {
-      
+
     }
-    
+
     connect() {
-      
+
     }
-    
+
     pull() {
-      
+
     }
-    
+
     push() {
-      
+
     }
 
 }
