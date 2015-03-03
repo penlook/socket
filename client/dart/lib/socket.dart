@@ -30,14 +30,113 @@ library socket;
 
 import "dart:html";
 
-class Socket {
+part "transport.dart";
+part "polling.dart";
+part "event.dart";
+part "option.dart";
 
-    String port;
-    String host;
+/**
+ * Socket
+ *
+ * @category   Socket
+ * @package    Service
+ * @copyright  Penlook Development Team
+ * @license    GNU Affero General Public
+ * @version    1.0
+ * @link       http://github.com/penlook
+ * @since      Class available since Release 1.0
+ */
+class Socket extends Transport {
+
+    /**
+     * Socket protocol
+     * 
+     * @var string http | https
+     */
     String protocol;
+    
+    /**
+     * Host name
+     * 
+     * @var string 
+     */
+    String host;         
+    
+    /**
+     * Server port
+     * 
+     * @var int
+     */
+    int port;  
+    
+    /**
+     * Socket server url
+     * 
+     * @var string
+     */
+    String url;
 
-    Socket(String host) {
+    /**
+     * Socket contructor
+     * 
+     * @param string protocol
+     * @param string localhost
+     * @param int    port 80 
+     */
+    Socket({String protocol : "http", String host : "localhost", int port: 80}) {
+         this.host = host;
+         this.port = port;
+         this.protocol = "http";
+         this.url = protocol + "://" + host + ":" + port.toString();
+    }
+    
+    String get Protocol => this.protocol;
+    String get Url      => this.url;
+    String get Host     => this.host;
+    int    get Port     => this.port;    
 
+    syncRequest(Socket context, Option option, Function callback) {
+      
+        // Initialize new HTTP Request
+        HttpRequest request = new HttpRequest();
+        
+        request.open(options.data, url, async: false);
+        request.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        
+        request.send(jsonData);
+       
+    }
+    
+    asyncRequest(Socket context, Option option, Function callback) {
+      
+    }
+    
+    processResponse() {
+      
+    }
+    
+    on() {
+      
+    }
+    
+    emit() {
+      
+    }
+    
+    remove() {
+      
+    }
+    
+    connect() {
+      
+    }
+    
+    pull() {
+      
+    }
+    
+    push() {
+      
     }
 
 }

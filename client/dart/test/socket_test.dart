@@ -30,16 +30,53 @@ library socket.test;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
-import 'dart:html';
+import 'package:socket/socket.dart';
 
 void main() {
 
     useHtmlConfiguration();
 
-    test("test paragraph", () {
-        DivElement test_id = querySelector("#test_id");
-        ParagraphElement paragraph = test_id.children.first;
-        expect("Test penlook frontend", paragraph.text.toString());
+    test("socket constructor", () {
+          
+        var socket = new Socket();
+        
+        expect("localhost", socket.Host);
+        expect(80, socket.Port);
+        
+        socket = new Socket(host:"192.168.2.1");
+        expect("192.168.2.1", socket.Host);
+        expect(80, socket.Port);
+        
+        socket = new Socket(host:"127.0.0.1", port: 3000);
+        expect("127.0.0.1", socket.Host);
+        expect(3000, socket.Port);
+       
     });
+    
+    test("synchronous request",() {
+        
+        var socket = new Socket();  
+        expect("test", "test");        
+        
+    }); 
+    
+    test("asynchronous request",() {
+        
+        var socket = new Socket();  
+        expect("test", "test");        
+        
+    }); 
+    
+    
+    test("asynchronous request",() {
+            
+        var socket = new Socket();  
+        expect("test", "test");        
+        
+    }); 
+    
+    
+        
+    
 
 }
