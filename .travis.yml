@@ -4,6 +4,8 @@ language:
 
 with_content_shell: true
 
+sudo : true
+
 install:
     - . ./travis.sh
     - go get -v ./...
@@ -13,4 +15,4 @@ install:
 script:
     - go test
     - (cd ./pollserver && go run socket.go &)
-    - (cd ./client/dart && sudo xvfb-run -s '-screen 0 1024x768x24' pub global run test_runner --verbose --disable-ansi)
+    - (cd ./client/dart && xvfb-run -s '-screen 0 1024x768x24' pub global run test_runner --verbose --disable-ansi)
