@@ -26,17 +26,16 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-library test.socket;
+library test.transport;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 import 'package:socket/socket.dart';
-import 'dart:async';
 
 void main() {
 
     useHtmlConfiguration();
-
+    
     test("socket default constructor", () {
 
         var socket = new Socket();
@@ -44,26 +43,5 @@ void main() {
         expect(socket.Port, 80);
 
     });
-
-    test("socket custom constructor", () {
-
-        var socket = new Socket(host:"127.0.0.1", port: 3000);
-        expect(socket.Host, "127.0.0.1");
-        expect(socket.Port, 3000);
-
-    });
-
-    test("socket connect", () {
-
-        var socket = new Socket(host: "localhost", port: 1234);
-        socket.connect();
-
-        new Timer(new Duration(milliseconds: 100), expectAsync(() {
-            expect(socket.Handshake, isNotNull);
-            expect(socket.Handshake, hasLength(equals(20)));
-        }));
-
-    });
-   
-
+    
 }

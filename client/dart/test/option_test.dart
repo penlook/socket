@@ -26,7 +26,7 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-library option.test;
+library test.option;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';

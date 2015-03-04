@@ -32,8 +32,6 @@ import "dart:html";
 import "dart:convert";
 
 part "transport.dart";
-part "polling.dart";
-part "event.dart";
 part "option.dart";
 
 /**
@@ -47,7 +45,7 @@ part "option.dart";
  * @link       http://github.com/penlook
  * @since      Class available since Release 1.0
  */
-class Socket {
+class Socket extends Transport {
 
     /**
      * Socket protocol
@@ -112,53 +110,6 @@ class Socket {
         this.url = protocol + "://" + host + ":" + port.toString();
     }
 
-    /**
-     * HTTP Synchronous request
-     *
-     * @param Socket context
-     * @param Option option
-     * @param Function callback
-     */
-    void syncRequest(Socket context, Option option, Function callback(Socket context, Map data)) {
-
-        // Initialize new HTTP Request
-        HttpRequest request = new HttpRequest();
-
-        print(option.Method);
-
-        request.open(option.Method, this.Url + option.Url, async: false);
-        request.send(option.Data);
-
-        Map data = null;
-
-        print(request.responseText);
-
-        try {
-           data = JSON.decode(request.responseText);
-        } catch (e) {
-           throw e;
-       }
-
-       callback(context, data);
-    }
-
-    /**
-     * HTTP Asynchronous request
-     *
-     * @param Socket context
-     * @param Option option
-     * @param Function callback
-     */
-    void asyncRequest(Socket context, Option option, Function callback) {
-
-    }
-
-    void sendRequest(Socket context, Option option, Function callback) {
-        option.Async ?
-            this.asyncRequest(context, option, callback) :
-                this.syncRequest(context, option, callback);
-    }
-
     void processResponse() {
 
     }
@@ -176,14 +127,15 @@ class Socket {
     }
 
     void connect() {
-        var option = new Option(url: "/polling");
+        var option = new Option(url: this.Url + "/polling");
 
         // Synchronous request
         option.Async = false;
 
-        this.sendRequest(this, option, (Socket socket, Map data) {
-            if (data["event"] == "connection") {
-                print(data["data"]);
+        this.sendRequest(this, option, (Socket socket, Map<String, Map> response) {
+            if (response["event"] == "connection") {
+                Map data = response["data"];
+                socket.Handshake = data["handshake"];                
             }
         });
     }
