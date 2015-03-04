@@ -26,7 +26,7 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-part of socket;
+part of socket.polling;
 
 abstract class Transport {    
 
@@ -63,11 +63,11 @@ abstract class Transport {
      * @param Option option
      * @param Function callback
      */
-    void asyncRequest(Socket context, Option option, Function callback(Object context, Map<String, Map> response)) {
+    void asyncRequest(Object context, Option option, Function callback(Object context, Map<String, Map> response)) {
     
     }
 
-    void sendRequest(Socket context, Option option, Function callback) {
+    void sendRequest(Object context, Option option, Function callback) {
         option.Async ?
             this.asyncRequest(context, option, callback) :
                 this.syncRequest(context, option, callback);

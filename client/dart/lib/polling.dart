@@ -26,8 +26,22 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-library socket.event;
+library socket.polling;
 
-abstract class Event {
+import "dart:html";
+import "dart:convert";
+import "option.dart";
+
+part "transport.dart";
+
+class Polling extends Transport {  
+
+    void pull() {
+          
+    } 
   
+    void push() {
+  
+    }
+      
 }

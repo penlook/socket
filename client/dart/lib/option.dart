@@ -26,7 +26,7 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-part of socket;
+library socket.option;
 
 class Option {
 

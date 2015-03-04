@@ -26,14 +26,11 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-library socket;
+library socket.main;
 
-import "dart:html";
-import "dart:convert";
-
-part "transport.dart";
-part "event.dart";
-part "option.dart";
+import "polling.dart";
+import "event.dart";
+import "option.dart";
 
 /**
  * Socket
@@ -46,7 +43,7 @@ part "option.dart";
  * @link       http://github.com/penlook
  * @since      Class available since Release 1.0
  */
-class Socket extends Transport implements Event {
+class Socket extends Polling with Event {
 
     /**
      * Socket protocol
@@ -110,6 +107,20 @@ class Socket extends Transport implements Event {
         this.protocol = "http";
         this.url = protocol + "://" + host + ":" + port.toString();
     }
+    
+    void connect() {
+          var option = new Option(url: this.Url + "/polling");
+
+          // Synchronous request
+          option.Async = false;
+
+          this.sendRequest(this, option, (Socket socket, Map<String, Map> response) {
+              if (response["event"] == "connection") {
+                  Map data = response["data"];
+                  socket.Handshake = data["handshake"];                
+              }
+          });
+      }
 
     void processResponse() {
 
@@ -124,28 +135,6 @@ class Socket extends Transport implements Event {
     }
 
     void remove() {
-
-    }
-
-    void connect() {
-        var option = new Option(url: this.Url + "/polling");
-
-        // Synchronous request
-        option.Async = false;
-
-        this.sendRequest(this, option, (Socket socket, Map<String, Map> response) {
-            if (response["event"] == "connection") {
-                Map data = response["data"];
-                socket.Handshake = data["handshake"];                
-            }
-        });
-    }
-
-    void pull() {
-
-    }
-
-    void push() {
 
     }
 

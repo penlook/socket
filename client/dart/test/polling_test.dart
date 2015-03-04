@@ -26,8 +26,17 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-library socket.event;
+library test.polling;
 
-abstract class Event {
-  
+import 'package:unittest/unittest.dart';
+import 'package:unittest/html_config.dart';
+
+void main() {
+
+    useHtmlConfiguration();
+    
+    test("event default constructor", () {
+    
+    });
+    
 }
