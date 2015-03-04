@@ -32,6 +32,7 @@ import "dart:html";
 import "dart:convert";
 
 part "transport.dart";
+part "event.dart";
 part "option.dart";
 
 /**
@@ -45,7 +46,7 @@ part "option.dart";
  * @link       http://github.com/penlook
  * @since      Class available since Release 1.0
  */
-class Socket extends Transport {
+class Socket extends Transport implements Event {
 
     /**
      * Socket protocol
