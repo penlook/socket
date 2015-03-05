@@ -42,7 +42,7 @@ void main() {
         var option = new Option();
         expect(option.Method, "GET");
         expect(option.Url, "");
-        expect(option.Data, "{}");
+        expect(option.Data, {});
         expect(option.Timeout, 60);
         expect(option.Async, isTrue);
 
@@ -63,7 +63,7 @@ void main() {
 
         expect(option.Method, "POST");
         expect(option.Url, "/abc");
-        expect(option.Data, "{key:value}");
+        expect(option.Data, {"key" : "value"});
         expect(option.Timeout, 20);
         expect(option.Async, isFalse);
 
@@ -80,9 +80,9 @@ void main() {
         option.Url = "/abc";
         expect(option.Url, "/abc");
 
-        expect(option.Data, "{}");
-        option.Data = "{key:value}";
-        expect(option.Data, "{key:value}");
+        expect(option.Data, {});
+        option.Data = {"key" : "value"};
+        expect(option.Data, {"key" : "value"});
 
         expect(option.Timeout, 60);
         option.Timeout = 20;

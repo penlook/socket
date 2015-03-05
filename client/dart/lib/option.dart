@@ -93,6 +93,9 @@ class Option {
     }) {
         this.method = method;
         this.url = url;
+        if (data == null) {
+            data = {};   
+        } 
         this.data = data;
         this.timeout = timeout;
         this.async = async;
