@@ -29,5 +29,21 @@
 library socket.event;
 
 abstract class Event {
-  
+
+    void on() {
+
+    }
+
+    void emit() {
+
+    }
+
+    void remove() {
+
+    }
+
+    void removeAll() {
+
+    }
+
 }

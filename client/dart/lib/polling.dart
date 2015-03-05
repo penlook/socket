@@ -34,14 +34,14 @@ import "option.dart";
 
 part "transport.dart";
 
-class Polling extends Transport {  
+class Polling extends Transport {
 
     void pull() {
-          
-    } 
-  
-    void push() {
-  
+
     }
-      
+
+    void push() {
+
+    }
+
 }

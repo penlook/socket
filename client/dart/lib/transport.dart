@@ -28,12 +28,12 @@
 
 part of socket.polling;
 
-abstract class Transport {    
+abstract class Transport {
 
     /**
      * HTTP Synchronous request
      *
-     * @param Socket context
+     * @param Context context
      * @param Option option
      * @param Function callback
      */
@@ -42,7 +42,7 @@ abstract class Transport {
         // Initialize new HTTP Request
         HttpRequest request = new HttpRequest();
 
-        request.open(option.Method, option.Url, async: false);        
+        request.open(option.Method, option.Url, async: false);
 
         Map<String, Map> response = null;
 
@@ -51,26 +51,59 @@ abstract class Transport {
            response = JSON.decode(request.responseText);
         } catch (e) {
            throw e;
-       }
+        }
 
-       callback(context, response);
+        callback(context, response);
     }
 
     /**
      * HTTP Asynchronous request
      *
-     * @param Socket context
+     * @param Context context
      * @param Option option
      * @param Function callback
      */
     void asyncRequest(Object context, Option option, Function callback(Object context, Map<String, Map> response)) {
-    
+
+        HttpRequest request = new HttpRequest();
+
+        request.onReadyStateChange.listen((_) {
+            if (request.readyState == HttpRequest.DONE &&
+                (request.status == 200 || request.status == 0)) {
+
+                Map<String, Map> response = null;
+
+                try {
+                    response = JSON.decode(request.responseText);
+                } catch (e) {
+                   throw e;
+                }
+
+                callback(context, response);
+            }
+        });
+
+        request.open(option.Method, option.Url, async: option.Async);
+        request.timeout = option.Timeout;
+
+        try {
+            request.send(option.Data);
+        } catch (e) {
+            throw e;
+        }
     }
 
-    void sendRequest(Object context, Option option, Function callback) {
+    /**
+     * Send HTTP Request
+     *
+     * @param Object context
+     * @param Option option
+     * @param Function callback
+     */
+    void sendRequest(Object context, Option option, Function callback(Object context, Map<String, Map> response)) {
         option.Async ?
             this.asyncRequest(context, option, callback) :
                 this.syncRequest(context, option, callback);
     }
-    
+
 }

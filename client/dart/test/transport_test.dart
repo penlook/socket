@@ -30,18 +30,38 @@ library test.transport;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
-import 'package:socket/socket.dart';
+import 'package:socket/polling.dart';
+import 'package:socket/option.dart';
+
+// Test abstract class
+class TestTransport extends Transport {}
+
+class Context {
+    String test;
+}
 
 void main() {
 
     useHtmlConfiguration();
-    
-    test("socket default constructor", () {
 
-        var socket = new Socket();
-        expect(socket.Host, "localhost");
-        expect(socket.Port, 80);
+    test("transport synchronous", () {
+
+        var test = new TestTransport();
+        var context = new Context();
+        var option  = new Option();
+
+        test.syncRequest(context, option, (Context context, Map<String, Map> response) {
+
+        });
 
     });
-    
+
+    test("transport asynchronous", () {
+
+    });
+
+    test("transport request", () {
+
+    });
+
 }

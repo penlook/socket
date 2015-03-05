@@ -107,7 +107,7 @@ class Socket extends Polling with Event {
         this.protocol = "http";
         this.url = protocol + "://" + host + ":" + port.toString();
     }
-    
+
     void connect() {
           var option = new Option(url: this.Url + "/polling");
 
@@ -117,7 +117,7 @@ class Socket extends Polling with Event {
           this.sendRequest(this, option, (Socket socket, Map<String, Map> response) {
               if (response["event"] == "connection") {
                   Map data = response["data"];
-                  socket.Handshake = data["handshake"];                
+                  socket.Handshake = data["handshake"];
               }
           });
       }
@@ -125,17 +125,4 @@ class Socket extends Polling with Event {
     void processResponse() {
 
     }
-
-    void on() {
-
-    }
-
-    void emit() {
-
-    }
-
-    void remove() {
-
-    }
-
 }
