@@ -34,7 +34,7 @@ socket.Initialize()
 
 socket.On("connection", func(client Client) {
 	client.On("ping", func(data Json) {
-		ftm.Println(data); // Ping to server
+		ftm.Println(data); // Ping from client
 		client.emit("pong", Json {
 			data: "Pong from server"
 		})
