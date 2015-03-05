@@ -54,7 +54,9 @@ void main() {
         var option = new Option(
              method: "POST",
              url:"/abc",
-             data: "{key:value}",
+             data:  {
+                "key":"value"
+             },
              timeout: 20,
              async: false
          );

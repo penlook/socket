@@ -62,8 +62,36 @@ void main() {
             expect(socket.Handshake, isNotNull);
             expect(socket.Handshake, hasLength(equals(20)));
         }));
-
+        
     });
+    
+    test("socket on", () {
+        // Pass  
+    });
+    
+    test("socket trigger", () {
+        // Pass
+    });
+    
+    test("socket push", () {
+        // Converted from Javascript
+        // TODO
+    }); 
+   
+    test("socket pull", () {
+        // Converted from Javascript
+        // TODO
+    });
+    
+    test("socket emit", () {
+        // Converted from Javascript
+        // TODO
+    });
+    
+    
+    
+    
+    
    
 
 }

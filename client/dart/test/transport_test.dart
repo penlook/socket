@@ -30,7 +30,7 @@ library test.transport;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
-import 'package:socket/polling.dart';
+import 'package:socket/transport.dart';
 import 'package:socket/option.dart';
 
 // Test abstract class
@@ -50,9 +50,11 @@ void main() {
         var context = new Context();
         var option  = new Option();
 
+        /*         
         test.syncRequest(context, option, (Context context, Map<String, Map> response) {
 
-        });
+        });        
+        */
 
     });
 

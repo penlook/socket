@@ -30,13 +30,76 @@ library test.event;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
+import 'package:socket/event.dart';
+
+// Mockup to test abstract class
+class TestEvent extends Event {  
+    TestEvent() {
+        this.event = new List();
+    }
+}
 
 void main() {
 
-    useHtmlConfiguration();
-    
-    test("event default constructor", () {
-    
+    useHtmlConfiguration();    
+        
+    test("event node", () {        
+        
+        EventNode node = new EventNode("abc", (Object abc) {
+            abc.toString();
+        });
+        
+        expect(node.Name, "abc");
+        expect(node.Callback(new Object()), equals((Object abc) {}(new Object())));
+                
     });
+    
+    test("event - on", () {             
+         
+        TestEvent event = new TestEvent();
+      
+        event.on("connection", (Object abc) {
+            abc.toString();
+        });
+         
+        Iterator listEvent = event.event.iterator;
+        var len = 0;
+         
+        while (listEvent.moveNext()) {
+             EventNode firstNode = listEvent.current;
+             len ++;
+             expect(firstNode.Name, "connection");
+             expect(firstNode.Callback(new Object()), equals((Object abc) {}(new Object())));
+        }
+         
+        // Make sure linklist works properly
+        expect(len, 1);
+         
+    });
+    
+    test("event - trigger", () {
+        
+        TestEvent event = new TestEvent();
+        
+        var pass = false;
+        
+        event.on("connection", (Map<String, Map> data) {
+            expect(data["key1"].toString(), "value1");
+            expect(data["key2"].toString(), "value2");
+            
+            // Make sure callback works properly
+            pass = true;
+        });
+        
+        event.trigger("connection", {
+            "key1" : "value1",
+            "key2" : "value2"
+        });
+        
+        // Callback works fine !
+        expect(pass, isTrue);
+        
+    });
+    
     
 }
