@@ -26,8 +26,23 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-part of socket.polling;
+library socket.transport;
 
+import "dart:html";
+import "dart:convert";
+import "option.dart";
+
+/**
+ * Transport
+ *
+ * @category   Transport
+ * @package    Service
+ * @copyright  Penlook Development Team
+ * @license    GNU Affero General Public
+ * @version    1.0
+ * @link       http://github.com/penlook
+ * @since      Class available since Release 1.0
+ */
 abstract class Transport {
 
     /**
@@ -35,13 +50,14 @@ abstract class Transport {
      *
      * @param Context context
      * @param Option option
-     * @param Function callback
+     * @param Function response_callback
      */
-    void syncRequest(Object context, Option option, Function callback(Object context, Map<String, Map> response)) {
+    void syncRequest(Object context, 
+                     Option option, 
+                     Function response_callback(Object context, Map<String, Map> response_callback)) {
 
         // Initialize new HTTP Request
         HttpRequest request = new HttpRequest();
-
         request.open(option.Method, option.Url, async: false);
 
         Map<String, Map> response = null;
@@ -53,7 +69,8 @@ abstract class Transport {
            throw e;
         }
 
-        callback(context, response);
+        response_callback(context, response);
+        
     }
 
     /**
@@ -61,9 +78,13 @@ abstract class Transport {
      *
      * @param Context context
      * @param Option option
-     * @param Function callback
+     * @param Function response_callback
+     * @param Function timeout_callback 
      */
-    void asyncRequest(Object context, Option option, Function callback(Object context, Map<String, Map> response)) {
+    void asyncRequest(Object context, 
+                      Option option, 
+                      Function response_callback(Object context, Map<String, Map> response_callback),
+                      Function timeout_callback(Object context)) {
 
         HttpRequest request = new HttpRequest();
 
@@ -79,7 +100,13 @@ abstract class Transport {
                    throw e;
                 }
 
-                callback(context, response);
+                response_callback(context, response);
+            }
+        });
+        
+        request.onTimeout.listen((_) {
+            if (timeout_callback != null)  {
+                timeout_callback(context);
             }
         });
 
@@ -91,6 +118,7 @@ abstract class Transport {
         } catch (e) {
             throw e;
         }
+        
     }
 
     /**
@@ -98,12 +126,18 @@ abstract class Transport {
      *
      * @param Object context
      * @param Option option
-     * @param Function callback
+     * @param Function response_callback
+     * @param [optional] Function timeout_callback
      */
-    void sendRequest(Object context, Option option, Function callback(Object context, Map<String, Map> response)) {
+    void sendRequest(Object context, 
+                     Option option, 
+                     Function response_callback(Object context, Map<String, Map> response_callback),
+                     {Function timeout_callback(Object timeout_callback)}) {
+      
         option.Async ?
-            this.asyncRequest(context, option, callback) :
-                this.syncRequest(context, option, callback);
+            this.asyncRequest(context, option, response_callback, timeout_callback) :
+                this.syncRequest(context, option, response_callback);
+        
     }
 
 }

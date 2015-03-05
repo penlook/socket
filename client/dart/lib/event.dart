@@ -28,22 +28,42 @@
 
 library socket.event;
 
+class EventNode {
+  
+    String name;
+    set Name(String name_) => name = name_;
+    get Name => name;       
+    
+    Function callback;
+    set Callback(Function callback_) => callback = callback_;
+    get Callback => callback;
+      
+    EventNode(String name, Function callback) {
+        this.name = name;
+        this.callback = callback;
+    }
+    
+}
+
 abstract class Event {
-
-    void on() {
-
+        
+    List<EventNode> event;
+    
+    void on(String event, Function callback) {
+        this.event.add(new EventNode(event, callback));
     }
-
-    void emit() {
-
+    
+    void trigger(String event, Map<String, Map> data) {                  
+        Iterator listEvent = this.event.iterator;
+        
+        while (listEvent.moveNext()) {
+            EventNode node = listEvent.current as EventNode;
+            if (node.Name == event) {
+                node.Callback(data);
+            }
+        } 
     }
-
-    void remove() {
-
-    }
-
-    void removeAll() {
-
-    }
-
+        
+    void emit(String event, Map<String, Map> data) {}    
+    
 }

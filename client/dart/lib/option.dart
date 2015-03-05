@@ -53,9 +53,9 @@ class Option {
      *
      * @var string
      */
-    String data;
-    String get Data => data;
-    set Data(String data_) => data = data_;
+    Map<String, Map> data;
+    Map<String, Map> get Data => data;
+    set Data(Map<String, Map> data_) => data = data_;
 
     /**
      * Request timeout
@@ -87,7 +87,7 @@ class Option {
     Option({
         String method: "GET",
         String url : "",
-        String data : "{}",
+        Map<String, Map> data : null,
         int timeout : 60,
         bool async : true
     }) {

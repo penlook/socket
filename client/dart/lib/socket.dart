@@ -28,7 +28,7 @@
 
 library socket.main;
 
-import "polling.dart";
+import "transport.dart";
 import "event.dart";
 import "option.dart";
 
@@ -43,7 +43,7 @@ import "option.dart";
  * @link       http://github.com/penlook
  * @since      Class available since Release 1.0
  */
-class Socket extends Polling with Event {
+class Socket extends Transport with Event {
 
     /**
      * Socket protocol
@@ -89,13 +89,13 @@ class Socket extends Polling with Event {
     String handshake;
     String get Handshake => handshake;
     set Handshake(String hanshake_) => handshake = hanshake_;
-
+    
     /**
      * Socket contructor
      *
-     * @param string protocol
-     * @param string localhost
-     * @param int    port 80
+     * @param string protocol [default=http] 
+     * @param string localhost [default=localhost]
+     * @param int    port [default=80]
      */
     Socket({
         String protocol : "http",
@@ -106,23 +106,106 @@ class Socket extends Polling with Event {
         this.port = port;
         this.protocol = "http";
         this.url = protocol + "://" + host + ":" + port.toString();
+        this.event = new List();
     }
 
+    /**
+     * Establish new connection to server
+     *
+     */
     void connect() {
-          var option = new Option(url: this.Url + "/polling");
-
-          // Synchronous request
-          option.Async = false;
-
+          
+          var option = new Option(
+                          url: this.Url + "/polling", 
+                          async: false
+                       );
+          
           this.sendRequest(this, option, (Socket socket, Map<String, Map> response) {
               if (response["event"] == "connection") {
                   Map data = response["data"];
                   socket.Handshake = data["handshake"];
               }
           });
-      }
-
-    void processResponse() {
-
+          
     }
+    
+    void disconnect() {
+        // TODO
+    }
+    
+    bool isConnected() {      
+        // TODO
+        return true;
+    }
+
+    void pull() {      
+      
+        if (this.handshake != null) {  
+            this.sendRequest (
+                this,
+                new Option(
+                    url: this.Url + "/polling" + this.handshake,
+                    async: false
+                ),                
+                // Response callback
+                (Object context, Map<String, Map> response) {
+                    Socket socket = context as Socket;                         
+                    socket.trigger(response["event"].toString(), response["data"]);
+                    
+                    // Create new pull
+                    socket.pull;
+                },
+                // Timeout callback
+                timeout_callback : (Object context) {
+                    Socket socket = context as Socket;
+                    
+                    // Create new pull
+                    socket.pull(); 
+                }
+            );
+        }
+        
+    }
+    
+    @override void emit(String event, Map<String, Map> data) {
+      
+        this.push(
+            {
+                "event" : event,
+                "data"  : data
+            },
+            (Object context, Map<String, Map> response) {
+              
+                // Socket type casting  
+                Socket socket = context as Socket;
+                socket.log("Done");
+                                                   
+            }
+        );
+        
+    }
+    
+    void push(Map<String, Map> event_data, Function callback(Object context, Map<String, Map> response)) {      
+        
+        if (this.handshake != null) {          
+            this.sendRequest(
+                this,
+                new Option(
+                    method: "POST",
+                    url: this.Url + "/polling" + this.handshake,
+                    data: event_data,
+                    async: false
+                ), 
+                callback
+            );
+        }
+        
+    }
+    
+    void log(String message) {
+        print(message);            
+    }
+    
+    
+    
 }
