@@ -10,9 +10,15 @@ Long-polling request support all major browsers
 <br></br>
 <br></br>
 
+# Roadmap
+
+- Support Web Socket for HTML5 browser compatibility
+- Implement binary transfer feature
+- Fix bug
+
 # Example
 
-Server
+Server - Go
 ```go
 import (
 	. "github.com/penlook/socket"
@@ -27,15 +33,32 @@ socket := Socket {
 socket.Initialize()
 
 socket.On("connection", func(client Client) {
-	client.On("init", func(data Json) {
-		// TODO
+	client.On("ping", func(data Json) {
+		ftm.Println(data); // Ping to server
+		client.emit("pong", Json {
+			data: "Pong from server"
+		})
 	})
 })
 
 socket.Listen()
 ```
 
-Client
+Client (Dart - Implementing)
+```dart
+Socket socket = new Socket(3000);
+
+socket.on("ping", (Map data) {
+	print(data); // Pong from server
+});
+
+socket.emit("ping", {
+	"data" : "Ping from client"
+})
+
+```
+
+Client (JS - deprecated)
 ```javascript
 var socket = new Socket(3000);
 
