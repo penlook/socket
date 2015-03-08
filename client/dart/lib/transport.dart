@@ -66,7 +66,8 @@ abstract class Transport {
            request.send(option.Data.toString());
            response = JSON.decode(request.responseText);
         } catch (e) {
-           throw e;
+          throw request.responseText;
+           //throw e;
         }
 
         response_callback(context, response);
@@ -114,7 +115,7 @@ abstract class Transport {
         request.timeout = option.Timeout;
 
         try {
-            request.send(option.Data);
+            request.send(option.Data.toString());
         } catch (e) {
             throw e;
         }

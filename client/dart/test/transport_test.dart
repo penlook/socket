@@ -32,6 +32,7 @@ import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
 import 'package:socket/transport.dart';
 import 'package:socket/option.dart';
+import 'dart:async';
 
 // Test abstract class
 class TestTransport extends Transport {}
@@ -46,24 +47,49 @@ void main() {
 
     test("transport synchronous", () {
 
-        var test = new TestTransport();
+        var transport = new TestTransport();
         var context = new Context();
-        var option  = new Option();
-
-        /*         
-        test.syncRequest(context, option, (Context context, Map<String, Map> response) {
-
+        var option  = new Option(url: "http://localhost:1234/polling");
+        
+        var flag = false;
+        
+        transport.syncRequest(context, option, (Context context, Map<String, Map> response) {
+            expect(response, isNotNull);
+            expect(response["event"], "connection");
+            flag = true;
         });        
-        */
-
+        
+        new Timer(new Duration(milliseconds: 100), expectAsync(() {
+            expect(flag, isTrue);            
+        }));        
+        
     });
 
     test("transport asynchronous", () {
-
-    });
-
-    test("transport request", () {
-
+      
+        var transport = new TestTransport();
+        var context = new Context();
+        var option  = new Option(url: "http://localhost:1234/polling");
+        
+        var flag_response = false;
+        var flag_timeout  = false;
+        
+        transport.asyncRequest(context, option, 
+            (Context context, Map<String, Map> response) {
+                expect(response, isNotNull);
+                expect(response["event"], "connection");
+                flag_response = true;
+            },
+            (Context context) {
+                flag_timeout = true;
+            }
+        );  
+        
+        new Timer(new Duration(milliseconds: 100), expectAsync(() {        
+            expect(flag_response, isTrue);
+            expect(flag_timeout, isFalse);   
+        }));
+        
     });
 
 }

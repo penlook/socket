@@ -154,7 +154,7 @@ class Socket extends Transport with Event {
                     socket.trigger(response["event"].toString(), response["data"]);
                     
                     // Create new pull
-                    socket.pull;
+                    socket.pull();
                 },
                 // Timeout callback
                 timeout_callback : (Object context) {
