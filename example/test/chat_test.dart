@@ -30,62 +30,11 @@ library test.socket;
 
 import 'package:unittest/unittest.dart';
 import 'package:unittest/html_config.dart';
-import 'package:socket/socket.dart';
+import 'package:chat/chat.dart';
 import 'dart:async';
 
 void main() {
 
     useHtmlConfiguration();
-
-    test("socket default constructor", () {
-
-        var socket = new Socket();
-        expect(socket.Host, "localhost");
-        expect(socket.Port, 80);
-
-    });
-
-    test("socket custom constructor", () {
-
-        var socket = new Socket(host:"127.0.0.1", port: 3000);
-        expect(socket.Host, "127.0.0.1");
-        expect(socket.Port, 3000);
-
-    });
-
-    test("socket connect", () {
-
-        var socket = new Socket(host: "localhost", port: 1234);
-        socket.connect();
-
-        new Timer(new Duration(milliseconds: 100), expectAsync(() {
-            expect(socket.Handshake, isNotNull);
-            expect(socket.Handshake, hasLength(equals(20)));
-        }));
-        
-    });
-    
-    test("socket on", () {
-        // Pass  
-    });
-    
-    test("socket trigger", () {
-        // Pass
-    });
-    
-    test("socket push", () {
-        // Converted from Javascript
-        // TODO
-    }); 
-   
-    test("socket pull", () {
-        // Converted from Javascript
-        // TODO
-    });
-    
-    test("socket emit", () {
-        // Converted from Javascript
-        // TODO
-    });    
 
 }
