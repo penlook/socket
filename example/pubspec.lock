@@ -17,6 +17,12 @@ packages:
     description: shadow_dom
     source: hosted
     version: "0.10.0"
+  socket:
+    description:
+      path: "..\\client"
+      relative: true
+    source: path
+    version: "0.0.1"
   stack_trace:
     description: stack_trace
     source: hosted

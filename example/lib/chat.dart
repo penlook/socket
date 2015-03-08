@@ -28,7 +28,6 @@
 
 library chat;
 
-import "../client/dart/lib/socket.dart";
 
 void main() {
     

@@ -27,14 +27,6 @@
  */
 
 library test.socket;
-
-import 'package:unittest/unittest.dart';
-import 'package:unittest/html_config.dart';
-import 'package:chat/chat.dart';
-import 'dart:async';
-
 void main() {
-
-    useHtmlConfiguration();
 
 }
