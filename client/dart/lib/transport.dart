@@ -63,7 +63,7 @@ abstract class Transport {
         Map<String, Map> response = null;
 
         try {
-           request.send(option.Data);
+           request.send(option.Data.toString());
            response = JSON.decode(request.responseText);
         } catch (e) {
            throw e;

@@ -55,13 +55,13 @@ void main() {
 
     test("socket connect", () {
 
-        /*var socket = new Socket(host: "localhost", port: 1234);
+        var socket = new Socket(host: "localhost", port: 1234);
         socket.connect();
 
         new Timer(new Duration(milliseconds: 100), expectAsync(() {
             expect(socket.Handshake, isNotNull);
             expect(socket.Handshake, hasLength(equals(20)));
-        }));*/
+        }));
         
     });
     

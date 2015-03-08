@@ -116,11 +116,12 @@ class Socket extends Transport with Event {
     void connect() {
           
           var option = new Option(
-                          url: this.Url + "/polling", 
-                          async: false
-                       );
+                               url: this.Url + "/polling", 
+                               async: false
+                           );
           
           this.sendRequest(this, option, (Socket socket, Map<String, Map> response) {
+              print(response);
               if (response["event"] == "connection") {
                   Map data = response["data"];
                   socket.Handshake = data["handshake"];
