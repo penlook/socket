@@ -26,11 +26,9 @@
  *     Nam Vo           <namvh@penlook.com>
  */
 
-library chat;
+import "package:chat/chat.dart";
 
-
-class Chat {
-    void Run() {
-        print("Hello Run");
-    }
+void main() {
+    Chat app = new Chat();
+    app.Run();
 }
